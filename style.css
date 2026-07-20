@@ -45,19 +45,46 @@ p{
     font-size:18px;
 }
 #pipeTop,
-#pipeBottom{
-    position:absolute;
-    width:60px;
-    background:green;
-    left:350px;
+#pipeBottom {
+    position: absolute;
+    width: 60px;
+    left: 350px;
+    
+    /* Creates a realistic wooden tree trunk texture using gradients */
+    background: repeating-linear-gradient(
+        90deg,
+        #5c4033 0px,
+        #4a3329 15px,
+        #3d281f 30px,
+        #4a3329 45px,
+        #5c4033 60px
+    );
+    
+    /* Adds subtle horizontal bark lines */
+    background-image: 
+        repeating-linear-gradient(90deg, #5c4033 0px, #4a3329 15px, #3d281f 30px, #4a3329 45px, #5c4033 60px),
+        repeating-linear-gradient(0deg, rgba(0,0,0,0.15) 0px, rgba(0,0,0,0.15) 4px, transparent 4px, transparent 20px);
+    background-blend-mode: multiply;
+
+    /* Gives the pillars a rounded, 3D log effect */
+    box-shadow: 
+        inset 10px 0 15px rgba(0, 0, 0, 0.5), 
+        inset -10px 0 15px rgba(0, 0, 0, 0.5),
+        2px 4px 6px rgba(0, 0, 0, 0.3);
+        
+    border-left: 2px solid #2e1d17;
+    border-right: 2px solid #2e1d17;
 }
 
-#pipeTop{
-    height:200px;
-    top:0;
+#pipeTop {
+    top: 0;
+    border-radius: 0 0 8px 8px; /* Rounds the bottom corners where the tree ends */
+    border-bottom: 5px solid #2e1d17; /* Dark rim at the opening */
 }
 
-#pipeBottom{
-    height:220px;
-    bottom:0;
-}
+#pipeBottom {
+    bottom: 0;
+    border-radius: 8px 8px 0 0; /* Rounds the top corners where the tree ends */
+    border-top: 5px solid #2e1d17; /* Dark rim at the opening */
+    }
+        
