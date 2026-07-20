@@ -12,8 +12,11 @@ let jump = -8;
 let score = 0;
 let scoreBox = document.getElementById("score");
 let scored = false;
+let gameOver = false;
 function update() {
-
+if (gameOver) {
+    return;
+}
     velocity += gravity;
     y += velocity;
 
@@ -32,6 +35,22 @@ pipeX -= 2;
 
 pipeTop.style.left = pipeX + "px";
 pipeBottom.style.left = pipeX + "px";
+    let mantisLeft = 70;
+let mantisRight = mantisLeft + 40;
+let mantisTop = y;
+let mantisBottom = y + 40;
+
+let pipeLeft = pipeX;
+let pipeRight = pipeX + 60;
+
+if (
+    mantisRight > pipeLeft &&
+    mantisLeft < pipeRight &&
+    (mantisTop < topHeight || mantisBottom > topHeight + gap)
+) {
+    gameOver = true;
+    alert("Game Over!\nScore: " + score);
+}
 if (pipeX < 70 && !scored) {
     score++;
     scoreBox.innerHTML = "Score: " + score;
