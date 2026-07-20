@@ -3,167 +3,112 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Free Games - Java Arcade</title>
+    <title>Free Games</title>
     <style>
+        /* CSS: This handles how everything looks */
         body {
             background-color: #000000;
             color: #ffffff;
-            font-family: 'Courier New', Courier, monospace;
-            margin: 0;
-            padding: 10px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            overflow-x: hidden;
-            user-select: none;
-            -webkit-user-select: none;
-        }
-
-        .header-title {
+            font-family: sans-serif;
             text-align: center;
-            margin-top: 10px;
-            font-size: 2.2rem;
-            color: #55ff55; 
-            text-shadow: 3px 3px #003300;
-            text-transform: uppercase;
+            margin: 0;
+            padding: 20px;
         }
 
-        /* Responsive Game Box */
-        #game-container {
-            width: 95%;
-            max-width: 500px;
-            height: 200px;
+        #game-box {
+            width: 320px; /* Small fixed width so it perfectly fits any mobile screen */
+            height: 150px;
+            background-color: #222222;
             position: relative;
-            background-color: #1a1a1a;
-            margin-top: 20px;
+            margin: 20px auto;
+            border: 3px solid #ffffff;
             overflow: hidden;
-            border: 4px solid #4a4a4a;
-            box-shadow: 0px 0px 15px rgba(0, 255, 0, 0.2);
         }
 
-        .ground {
-            width: 100%;
-            height: 20px;
-            background-color: #5c3a21;
-            border-top: 5px solid #55ff55;
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            z-index: 2;
-        }
-
-        /* Player Character */
+        /* THE DINO (Green Square) */
         #dino {
             width: 30px;
-            height: 40px;
-            background-color: #00a86b; 
-            border: 2px solid #005c3e;
+            height: 30px;
+            background-color: #00ff88; /* Bright neon green */
             position: absolute;
-            bottom: 20px; 
-            left: 30px; /* Moved slightly right so it's clearly visible */
-            z-index: 3;
+            bottom: 0;
+            left: 20px;
         }
 
-        /* Enemy Obstacle */
+        /* THE CACTUS (Red Square) */
         #cactus {
             width: 20px;
-            height: 35px;
-            background-color: #ff2222; 
-            border: 2px solid #880000;
+            height: 30px;
+            background-color: #ff3333; /* Bright red */
             position: absolute;
-            bottom: 20px;
-            right: -30px;
-            z-index: 3;
+            bottom: 0;
+            left: 300px;
         }
 
-        .jump {
-            animation: jump-animation 0.55s cubic-bezier(0.25, 1, 0.5, 1);
+        /* CSS Animation for jumping */
+        .jump-animation {
+            animation: jump 0.5s linear;
         }
 
-        @keyframes jump-animation {
-            0% { bottom: 20px; }
-            50% { bottom: 120px; }
-            100% { bottom: 20px; }
-        }
-
-        #score-board {
-            margin-top: 15px;
-            font-size: 1.3rem;
-            color: #ffff55;
-            text-shadow: 2px 2px #333300;
+        @keyframes jump {
+            0% { bottom: 0; }
+            50% { bottom: 80px; }
+            100% { bottom: 0; }
         }
     </style>
 </head>
 <body>
 
-    <h1 class="header-title">JAVA RUNNER</h1>
+    <h1>Free Games</h1>
     
-    <div id="game-container" onclick="jump()">
+    <!-- The Game Window -->
+    <div id="game-box" onclick="jump()">
         <div id="dino"></div>
         <div id="cactus"></div>
-        <div class="ground"></div>
     </div>
 
-    <div id="score-board">SCORE: <span id="score">0</span></div>
+    <p>Tap the dark grey box to jump!</p>
 
     <script>
+        // JS: This handles the game actions and physics
         const dino = document.getElementById("dino");
         const cactus = document.getElementById("cactus");
-        const scoreDisplay = document.getElementById("score");
-        const container = document.getElementById("game-container");
-        
-        let score = 0;
-        let isAlive = true;
-        let cactusPosition = 500;
 
         function jump() {
-            if (!dino.classList.contains("jump") && isAlive) {
-                dino.classList.add("jump");
-                setTimeout(function () {
-                    dino.classList.remove("jump");
-                }, 550);
+            if (!dino.classList.contains("jump-animation")) {
+                dino.classList.add("jump-animation");
+                
+                // Remove the animation class after 500ms so you can jump again
+                setTimeout(function() {
+                    dino.classList.remove("jump-animation");
+                }, 500);
             }
         }
 
-        document.addEventListener("keydown", function (event) {
-            if (event.code === "Space") {
-                event.preventDefault();
-                jump();
-            }
-        });
-
-        function gameLoop() {
-            if (!isAlive) return;
-
-            // Get the current responsive width of the game container dynamically
-            let containerWidth = container.clientWidth;
-
-            cactusPosition -= 5; 
+        // Move the cactus across the screen
+        let cactusLeft = 300;
+        
+        function moveEnemy() {
+            cactusLeft -= 4; // Moves the red block left
             
-            if (cactusPosition < -20) {
-                cactusPosition = containerWidth; 
-                score++;
-                scoreDisplay.innerText = score;
+            if (cactusLeft < -20) {
+                cactusLeft = 320; // Resets it to the right side
             }
-            cactus.style.left = cactusPosition + "px";
-
+            
+            cactus.style.left = cactusLeft + "px";
+            
+            // Basic collision check
             let dinoBottom = parseInt(window.getComputedStyle(dino).getPropertyValue("bottom"));
-            
-            // Adjusted hitboxes to match the new mobile scale
-            if (cactusPosition > 30 && cactusPosition < 60 && dinoBottom <= 55) {
-                isAlive = false;
-                alert("Game Over! Score: " + score);
-                score = 0;
-                scoreDisplay.innerText = score;
-                cactusPosition = containerWidth;
-                isAlive = true;
+            if (cactusLeft > 20 && cactusLeft < 50 && dinoBottom < 30) {
+                alert("Game Over! Try again.");
+                cactusLeft = 320;
             }
 
-            requestAnimationFrame(gameLoop);
+            requestAnimationFrame(moveEnemy);
         }
 
-        // Start loop after a tiny delay to let elements render
-        setTimeout(gameLoop, 500);
+        // Start moving the block
+        moveEnemy();
     </script>
 
 </body>
