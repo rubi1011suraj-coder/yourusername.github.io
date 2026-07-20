@@ -10,6 +10,8 @@ h1{
 }
 
 #game{
+    width:350px;
+height:600px;
     background: url("background.png");
 background-size: cover;
 background-position: center;
