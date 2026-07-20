@@ -54,6 +54,35 @@ h2{
     border-radius:8px;
 }
 
+/* --- NEW STYLES FOR THE GAME INTERFACE --- */
+.game-section {
+    text-align: center;
+    margin: 40px auto;
+    padding: 20px;
+    background: linear-gradient(145deg, #0d1b2a, #1b263b);
+    border: 2px dashed #00d4ff;
+    border-radius: 15px;
+    max-width: 400px;
+}
+
+.game-btn {
+    background: #00ea47;
+    color: black;
+    border: none;
+    padding: 15px 30px;
+    font-size: 20px;
+    font-weight: bold;
+    border-radius: 50px;
+    cursor: pointer;
+    box-shadow: 0 0 15px #00ea47;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.game-btn:hover {
+    transform: scale(1.1);
+    box-shadow: 0 0 25px #00ea47, 0 0 40px #00ea47;
+}
+
 footer{
     text-align:center;
     padding:20px;
@@ -109,17 +138,18 @@ Black holes are among the most fascinating objects in the universe. Scientists c
 
 </div>
 
+<!-- --- FIXED: GAME PORTAL PLACED PROPERLY INSIDE BODY --- -->
+<div class="game-section">
+    <h2>🎮 Play My Game</h2>
+    <a href="game.html" style="text-decoration: none;">
+        <button class="game-btn">🦗 Play Flappy Mantis</button>
+    </a>
+</div>
+
 <footer>
 Made by Rubi1011Suraj-Coder © 2026
 </footer>
 
 </body>
-</html>
-<h2>🎮 Play My Game</h2>
-
-<a href="game.html">
-    <button>🦗 Play Flappy Mantis</button>
-</a>
-
-</body>
-</html>
+    </html>
+    
