@@ -41,3 +41,20 @@ h1{
 p{
     font-size:18px;
 }
+#pipeTop,
+#pipeBottom{
+    position:absolute;
+    width:60px;
+    background:green;
+    left:350px;
+}
+
+#pipeTop{
+    height:200px;
+    top:0;
+}
+
+#pipeBottom{
+    height:220px;
+    bottom:0;
+}
