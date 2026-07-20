@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Free Games</title>
     <style>
-        /* CSS: This handles how everything looks */
         body {
             background-color: #000000;
             color: #ffffff;
@@ -16,7 +15,7 @@
         }
 
         #game-box {
-            width: 320px; /* Small fixed width so it perfectly fits any mobile screen */
+            width: 320px; 
             height: 150px;
             background-color: #222222;
             position: relative;
@@ -29,7 +28,7 @@
         #dino {
             width: 30px;
             height: 30px;
-            background-color: #00ff88; /* Bright neon green */
+            background-color: #00ff88; 
             position: absolute;
             bottom: 0;
             left: 20px;
@@ -39,13 +38,12 @@
         #cactus {
             width: 20px;
             height: 30px;
-            background-color: #ff3333; /* Bright red */
+            background-color: #ff3333; 
             position: absolute;
             bottom: 0;
-            left: 300px;
+            left: 320px;
         }
 
-        /* CSS Animation for jumping */
         .jump-animation {
             animation: jump 0.5s linear;
         }
@@ -55,59 +53,84 @@
             50% { bottom: 80px; }
             100% { bottom: 0; }
         }
+
+        #score-board {
+            font-size: 1.2rem;
+            margin-top: 10px;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
 
     <h1>Free Games</h1>
     
-    <!-- The Game Window -->
     <div id="game-box" onclick="jump()">
         <div id="dino"></div>
         <div id="cactus"></div>
     </div>
 
+    <div id="score-board">Score: <span id="score">0</span></div>
     <p>Tap the dark grey box to jump!</p>
 
     <script>
-        // JS: This handles the game actions and physics
         const dino = document.getElementById("dino");
         const cactus = document.getElementById("cactus");
+        const scoreDisplay = document.getElementById("score");
+
+        let score = 0;
+        let baseSpeed = 4; // Starting speed of the red block
+        let currentSpeed = baseSpeed;
+        let isAlive = true;
 
         function jump() {
-            if (!dino.classList.contains("jump-animation")) {
+            if (!dino.classList.contains("jump-animation") && isAlive) {
                 dino.classList.add("jump-animation");
                 
-                // Remove the animation class after 500ms so you can jump again
                 setTimeout(function() {
                     dino.classList.remove("jump-animation");
                 }, 500);
             }
         }
 
-        // Move the cactus across the screen
-        let cactusLeft = 300;
+        let cactusLeft = 320;
         
         function moveEnemy() {
-            cactusLeft -= 4; // Moves the red block left
+            if (!isAlive) return;
+
+            cactusLeft -= currentSpeed; // Moves using the dynamic speed variable
             
             if (cactusLeft < -20) {
-                cactusLeft = 320; // Resets it to the right side
+                cactusLeft = 320; // Reset position
+                score++;
+                scoreDisplay.innerText = score;
+
+                // EVERY 5 POINTS: Increase speed by 1
+                if (score > 0 && score % 5 === 0) {
+                    currentSpeed += 1; 
+                    console.log("Speed increased! Current speed: " + currentSpeed);
+                }
             }
             
             cactus.style.left = cactusLeft + "px";
             
-            // Basic collision check
+            // Collision check
             let dinoBottom = parseInt(window.getComputedStyle(dino).getPropertyValue("bottom"));
             if (cactusLeft > 20 && cactusLeft < 50 && dinoBottom < 30) {
-                alert("Game Over! Try again.");
+                isAlive = false;
+                alert("Game Over! Final Score: " + score);
+                
+                // Reset everything back to start configurations
+                score = 0;
+                currentSpeed = baseSpeed;
+                scoreDisplay.innerText = score;
                 cactusLeft = 320;
+                isAlive = true;
             }
 
             requestAnimationFrame(moveEnemy);
         }
 
-        // Start moving the block
         moveEnemy();
     </script>
 
