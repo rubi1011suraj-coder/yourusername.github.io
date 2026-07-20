@@ -1,155 +1,275 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<title>Black Holes - Space Explorer</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Flappy Mantis - Free Online Arcade Portal</title>
+    <style>
+        /* --- SYSTEM CORE STYLES --- */
+        body {
+            margin: 0;
+            padding: 0;
+            background: #000814;
+            color: #f0f5fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
 
-<style>
-body{
-    margin:0;
-    background:#000814;
-    color:white;
-    font-family:Arial,sans-serif;
-}
+        /* --- ARCADE TOP HEADER --- */
+        header {
+            background: linear-gradient(180deg, #001d3d 0%, #00152e 100%);
+            border-bottom: 2px solid #00d4ff;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 20px rgba(0, 212, 255, 0.2);
+        }
 
-header{
-    background:#001d3d;
-    padding:20px;
-    text-align:center;
-    font-size:32px;
-    font-weight:bold;
-    color:#00d4ff;
-}
+        .logo-area {
+            font-size: 24px;
+            font-weight: 900;
+            color: #00d4ff;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
 
-nav{
-    background:#003566;
-    text-align:center;
-    padding:12px;
-}
+        .nav-links a {
+            color: #ffd60a;
+            text-decoration: none;
+            font-weight: bold;
+            margin-left: 20px;
+            font-size: 14px;
+            text-transform: uppercase;
+            transition: color 0.2s;
+        }
 
-nav a{
-    color:white;
-    text-decoration:none;
-    margin:15px;
-    font-weight:bold;
-}
+        .nav-links a:hover {
+            color: #00ea47;
+        }
 
-.container{
-    width:90%;
-    max-width:900px;
-    margin:30px auto;
-    background:#111;
-    padding:25px;
-    border-radius:15px;
-}
+        /* --- MAIN LAYOUT CONSOLE --- */
+        .arcade-container {
+            display: flex;
+            flex: 1;
+            width: 100%;
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 0 20px;
+            box-sizing: border-box;
+            gap: 25px;
+        }
 
-h2{
-    color:#ffd60a;
-}
+        /* --- THEATER STAGE (THE GAME) --- */
+        .game-theater {
+            flex: 2;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: #0b132b;
+            border: 2px solid #003566;
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: inset 0 0 30px rgba(0,0,0,0.8);
+            position: relative;
+        }
 
-.fact{
-    background:#003566;
-    padding:15px;
-    border-left:5px solid cyan;
-    margin:15px 0;
-    border-radius:8px;
-}
+        .game-title-bar {
+            text-align: center;
+            margin-bottom: 15px;
+            width: 100%;
+        }
 
-/* --- NEW STYLES FOR THE GAME INTERFACE --- */
-.game-section {
-    text-align: center;
-    margin: 40px auto;
-    padding: 20px;
-    background: linear-gradient(145deg, #0d1b2a, #1b263b);
-    border: 2px dashed #00d4ff;
-    border-radius: 15px;
-    max-width: 400px;
-}
+        .game-title-bar h1 {
+            margin: 0;
+            font-size: 26px;
+            color: #00ea47;
+            text-shadow: 0 0 10px rgba(0, 234, 71, 0.4);
+        }
 
-.game-btn {
-    background: #00ea47;
-    color: black;
-    border: none;
-    padding: 15px 30px;
-    font-size: 20px;
-    font-weight: bold;
-    border-radius: 50px;
-    cursor: pointer;
-    box-shadow: 0 0 15px #00ea47;
-    transition: transform 0.2s, box-shadow 0.2s;
-}
+        .game-tagline {
+            font-size: 12px;
+            color: #8fa3b6;
+            margin-top: 4px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
 
-.game-btn:hover {
-    transform: scale(1.1);
-    box-shadow: 0 0 25px #00ea47, 0 0 40px #00ea47;
-}
+        #gameCanvas {
+            background: #87CEEB; /* Engine Fallback Screen Color */
+            border: 4px solid #003566;
+            border-radius: 8px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+            max-width: 100%;
+            height: auto;
+            touch-action: none;
+            aspect-ratio: 360 / 580;
+        }
 
-footer{
-    text-align:center;
-    padding:20px;
-    background:#001d3d;
-    margin-top:30px;
-}
-</style>
+        /* --- GAME METRICS & SIDEBAR --- */
+        .arcade-sidebar {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
 
+        .dashboard-panel {
+            background: #111a36;
+            border: 1px solid #003566;
+            border-radius: 12px;
+            padding: 20px;
+        }
+
+        .dashboard-panel h3 {
+            margin-top: 0;
+            color: #ffd60a;
+            border-bottom: 1px solid #003566;
+            padding-bottom: 8px;
+            font-size: 18px;
+        }
+
+        .stat-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .stat-card {
+            background: #00152e;
+            border: 1px solid #003566;
+            border-radius: 8px;
+            padding: 12px;
+            text-align: center;
+        }
+
+        .stat-val {
+            font-size: 20px;
+            font-weight: bold;
+            color: #00d4ff;
+        }
+
+        .stat-label {
+            font-size: 11px;
+            color: #8fa3b6;
+            text-transform: uppercase;
+            margin-top: 4px;
+        }
+
+        .control-badge {
+            background: #00152e;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-family: monospace;
+            color: #ffd60a;
+            font-size: 13px;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        /* --- FOOTER DECK --- */
+        footer {
+            text-align: center;
+            padding: 15px;
+            background: #00152e;
+            border-top: 1px solid #003566;
+            font-size: 12px;
+            color: #5f758a;
+            margin-top: auto;
+        }
+
+        /* --- RESPONSIVE MOBILE SCALING --- */
+        @media (max-width: 850px) {
+            .arcade-container {
+                flex-direction: column;
+                padding: 0 10px;
+            }
+            .arcade-sidebar {
+                flex: none;
+                width: 100%;
+            }
+            .game-theater {
+                padding: 10px;
+            }
+        }
+    </style>
 </head>
-
 <body>
 
-<header>
-🌌 Space Explorer 🌌
-</header>
+    <!-- ARCADE PLATFORM HEADER -->
+    <header>
+        <div class="logo-area">
+            🚀 SpaceArcade
+        </div>
+        <div class="nav-links">
+            <a href="index.html">Portal Home</a>
+            <a href="#">More Games</a>
+        </div>
+    </header>
 
-<nav>
-<a href="#">Home</a>
-<a href="#">Black Holes</a>
-<a href="#">Planets</a>
-<a href="#">Stars</a>
-</nav>
+    <!-- CORE PLAYGROUND LAYOUT -->
+    <div class="arcade-container">
+        
+        <!-- THEATER SCREEN BLOCK -->
+        <main class="game-theater">
+            <div class="game-title-bar">
+                <h1>Flappy Mantis Remastered</h1>
+                <div class="game-tagline">Free Instant Play • Web HTML5 Edition</div>
+            </div>
 
-<div class="container">
+            <!-- HARDWARE ACCELERATED RENDERING LAYER -->
+            <canvas id="gameCanvas" width="360" height="580"></canvas>
+        </main>
 
-<h2>🕳️ What is a Black Hole?</h2>
+        <!-- DATA / STATS SIDE PANEL -->
+        <aside class="arcade-sidebar">
+            
+            <!-- CONTROLS GUIDE -->
+            <div class="dashboard-panel">
+                <h3>🎮 How to Play</h3>
+                <div class="control-badge">
+                    <span>Desktop:</span>
+                    <span>SPACEBAR / CLICK</span>
+                </div>
+                <div class="control-badge">
+                    <span>Mobile:</span>
+                    <span>TAP SCREEN</span>
+                </div>
+                <p style="font-size: 13px; color: #8fa3b6; margin: 8px 0 0 0; line-height: 1.4;">
+                    Guide the green mantis through the gap in the giant tree logs. Avoid hitting the edges!
+                </p>
+            </div>
 
-<p>
-A black hole is a place in space where gravity is so strong that nothing can escape from it—not even light.
-</p>
+            <!-- ACCOUNT LIVE TRACKING SECTIONS -->
+            <div class="dashboard-panel">
+                <h3>📈 Session Metrics</h3>
+                <div class="stat-grid">
+                    <div class="stat-card">
+                        <div class="stat-val" id="uiBestScore">0</div>
+                        <div class="stat-label">All-Time Best</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-val">Free</div>
+                        <div class="stat-label">Access Pass</div>
+                    </div>
+                </div>
+            </div>
 
-<div class="fact">
-<b>Interesting Fact:</b><br>
-Scientists captured the first image of a black hole in 2019.
-</div>
+        </aside>
 
-<h2>⭐ How are Black Holes Formed?</h2>
+    </div>
 
-<p>
-When a very massive star runs out of fuel, it collapses under its own gravity. If the remaining core is massive enough, it becomes a black hole.
-</p>
-
-<div class="fact">
-<b>Did You Know?</b><br>
-Our Milky Way galaxy has a supermassive black hole called Sagittarius A*.
-</div>
-
-<h2>🚀 Conclusion</h2>
-
-<p>
-Black holes are among the most fascinating objects in the universe. Scientists continue studying them to learn more about space and time.
-</p>
-
-</div>
-
-<!-- --- FIXED: GAME PORTAL PLACED PROPERLY INSIDE BODY --- -->
-<div class="game-section">
-    <h2>🎮 Play My Game</h2>
-    <a href="game.html" style="text-decoration: none;">
-        <button class="game-btn">🦗 Play Flappy Mantis</button>
-    </a>
-</div>
-
-<footer>
-Made by Rubi1011Suraj-Coder © 2026
-</footer>
+    <!-- ARCADE LEGALS FOOTER -->
+    <footer>
+        Flappy Mantis Remastered Platform © 2026 • Built for Optimized Mobile Performance
+    </footer>
 
 </body>
-    </html>
+                    </html>
     
