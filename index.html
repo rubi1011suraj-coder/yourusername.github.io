@@ -5,31 +5,159 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Free Games</title>
     <style>
-        /* This styles the whole page */
+        /* Base page styling */
         body {
-            background-color: #000000; /* Black background */
-            color: #ffffff;            /* White text color */
+            background-color: #000000;
+            color: #ffffff;
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            overflow-x: hidden;
         }
 
-        /* This styles the main title */
         .header-title {
             text-align: center;
-            margin-top: 20px;
-            font-size: 3rem;
+            margin-top: 10px;
+            font-size: 2.5rem;
             text-transform: uppercase;
             letter-spacing: 2px;
+        }
+
+        /* Game container settings */
+        #game-container {
+            width: 600px;
+            height: 200px;
+            border-bottom: 4px solid #ffffff;
+            position: relative;
+            background-color: #111111;
+            margin-top: 30px;
+            overflow: hidden;
+        }
+
+        /* The Dino player */
+        #dino {
+            width: 40px;
+            height: 40px;
+            background-color: #00ffcc; /* Bright teal dino */
+            position: absolute;
+            bottom: 0;
+            left: 50px;
+        }
+
+        /* The Cactus obstacle */
+        #cactus {
+            width: 20px;
+            height: 40px;
+            background-color: #ff3366; /* Bright pink cactus */
+            position: absolute;
+            bottom: 0;
+            right: -20px;
+        }
+
+        /* Jump animation */
+        .jump {
+            animation: jump-animation 0.5s linear;
+        }
+
+        @keyframes jump-animation {
+            0% { bottom: 0; }
+            50% { bottom: 100px; }
+            100% { bottom: 0; }
+        }
+
+        /* Score board text */
+        #score-board {
+            margin-top: 15px;
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        /* Mobile Tap Zone Instruction */
+        .controls-hint {
+            margin-top: 15px;
+            color: #888888;
+            font-size: 0.9rem;
+            text-align: center;
         }
     </style>
 </head>
 <body>
 
     <h1 class="header-title">Free Games</h1>
+    
+    <!-- Game Window -->
+    <div id="game-container" onclick="jump()">
+        <div id="dino"></div>
+        <div id="cactus"></div>
+    </div>
 
-    <!-- You can add your list of games or content below this line -->
+    <div id="score-board">Score: <span id="score">0</span></div>
+    <p class="controls-hint">Press <b>Spacebar</b> or <b>Tap the game screen</b> to jump!</p>
+
+    <script>
+        const dino = document.getElementById("dino");
+        const cactus = document.getElementById("cactus");
+        const scoreDisplay = document.getElementById("score");
+        
+        let score = 0;
+        let isAlive = true;
+
+        // Jump Function logic
+        function jump() {
+            if (!dino.classList.contains("jump") && isAlive) {
+                dino.classList.add("jump");
+
+                setTimeout(function () {
+                    dino.classList.remove("jump");
+                }, 500); // Animation duration is 500ms
+            }
+        }
+
+        // Listen for Spacebar key
+        document.addEventListener("keydown", function (event) {
+            if (event.code === "Space") {
+                jump();
+            }
+        });
+
+        // Obstacle movement loop
+        let cactusPosition = 600;
+        function moveCactus() {
+            if (!isAlive) return;
+
+            cactusPosition -= 6; // Speed of the cactus
+            if (cactusPosition < -20) {
+                cactusPosition = 600; // Reset to the right edge
+                score++;
+                scoreDisplay.innerText = score;
+            }
+            cactus.style.left = cactusPosition + "px";
+
+            // Collision Detection Setup
+            let dinoBottom = parseInt(window.getComputedStyle(dino).getPropertyValue("bottom"));
+            
+            // Check if Dino and Cactus overlap
+            if (cactusPosition > 50 && cactusPosition < 90 && dinoBottom <= 40) {
+                // Game Over logic
+                isAlive = false;
+                alert("Game Over! Your final score: " + score);
+                
+                // Reset the game
+                score = 0;
+                scoreDisplay.innerText = score;
+                cactusPosition = 600;
+                isAlive = true;
+            }
+
+            requestAnimationFrame(moveCactus);
+        }
+
+        // Start the game loop
+        moveCactus();
+    </script>
 
 </body>
 </html>
-
