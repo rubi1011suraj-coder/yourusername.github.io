@@ -9,7 +9,9 @@ let y = 250;
 let velocity = 0;
 let gravity = 0.5;
 let jump = -8;
-
+let score = 0;
+let scoreBox = document.getElementById("score");
+let scored = false;
 function update() {
 
     velocity += gravity;
@@ -30,11 +32,15 @@ pipeX -= 2;
 
 pipeTop.style.left = pipeX + "px";
 pipeBottom.style.left = pipeX + "px";
-
+if (pipeX < 70 && !scored) {
+    score++;
+    scoreBox.innerHTML = "Score: " + score;
+    scored = true;
+}
 if (pipeX < -60) {
 
     pipeX = 350;
-
+scored = false;
     topHeight = Math.floor(Math.random() * 220) + 50;
 
     pipeTop.style.height = topHeight + "px";
