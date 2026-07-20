@@ -1,20 +1,21 @@
-const canvas = document.getElementById("gameCanvas");
+
+            const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
 const uiBestScore = document.getElementById("uiBestScore");
 
 // --- HIGH-PERFORMANCE ENGINE SETTINGS ---
 const physics = {
-    gravity: 0.65,      // Snappy gravity pull
-    jumpForce: -10,     // Instant, powerful vertical push
-    pipeSpeed: 5,       // Fast obstacle forward velocity
-    pipeGap: 155        // Balanced vertical opening space
+    gravity: 0.65,      
+    jumpForce: -10,     
+    pipeSpeed: 5,       
+    pipeGap: 155        
 };
 
 // --- CORE OBJECT SCHEMATICS ---
 let mantis = {
     x: 70,
     y: 250,
-    radius: 15,         // Pixel boundary radius for crisp circle tracking
+    radius: 15,         
     velocity: 0
 };
 
@@ -22,8 +23,10 @@ let pipes = [];
 let score = 0;
 let highScore = localStorage.getItem("mantisHighScore") || 0;
 
-// Update the UI sidebar block right away with historical high score
-if (uiBestScore) uiBestScore.innerText = highScore;
+// Safe UI check to prevent silent script crashes
+if (uiBestScore) {
+    uiBestScore.innerText = highScore;
+}
 
 let gameOver = false;
 let gameStarted = false;
@@ -43,22 +46,30 @@ function createPipe() {
     });
 }
 
-// --- HARDWARE CORE INPUT CONTROLLER ---
+// --- UNIVERSAL ACCESSIBILITY INPUT CONTROLLER ---
 function triggerJump(e) {
-    if (e) e.preventDefault(); // Lock down phone page viewport shifts
+    // ONLY prevent default on actual mobile touch events to avoid breaking clicks
+    if (e && e.type === "touchstart") {
+        e.preventDefault(); 
+    }
 
     if (gameOver) {
         resetGame();
         return;
     }
-    if (!gameStarted) gameStarted = true;
+    
+    if (!gameStarted) {
+        gameStarted = true;
+    }
     
     mantis.velocity = physics.jumpForce;
 }
 
-// Event Tracking Listeners
+// Global input listeners tracking side-by-side
 document.addEventListener("keydown", (e) => { 
-    if (e.code === "Space" || e.code === "ArrowUp") triggerJump(); 
+    if (e.code === "Space" || e.code === "ArrowUp") {
+        triggerJump(e); 
+    }
 });
 canvas.addEventListener("touchstart", triggerJump, { passive: false });
 canvas.addEventListener("mousedown", triggerJump);
@@ -84,25 +95,21 @@ function updateHighScore() {
 
 // --- GRAPHICS AND RENDERING ENGINE LOOP ---
 function loop() {
-    // 1. Wipe Graphic Buffer 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     
-    // Draw Space / Sky Background Layer
     ctx.fillStyle = "#0a192f"; 
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    // Subtle starry grid look background element
+    // Starry grid background decoration
     ctx.fillStyle = "rgba(255, 255, 255, 0.15)";
     for (let i = 0; i < canvas.width; i += 40) {
         ctx.fillRect(i + 15, (i * 2) % canvas.height, 2, 2);
     }
 
     if (gameStarted && !gameOver) {
-        // 2. Compute Player Vectors
         mantis.velocity += physics.gravity;
         mantis.y += mantis.velocity;
 
-        // Canvas Boundary Constraints
         if (mantis.y + mantis.radius > canvas.height) {
             mantis.y = canvas.height - mantis.radius;
             gameOver = true;
@@ -110,10 +117,9 @@ function loop() {
         }
         if (mantis.y - mantis.radius < 0) {
             mantis.y = mantis.radius;
-            mantis.velocity = 0; // Ceiling bumper block
+            mantis.velocity = 0; 
         }
 
-        // 3. Compute Pillar Coordinates
         if (pipes.length === 0 || pipes[pipes.length - 1].x < canvas.width - 210) {
             createPipe();
         }
@@ -122,20 +128,17 @@ function loop() {
             let p = pipes[i];
             p.x -= physics.pipeSpeed;
 
-            // Score Tracker
             if (!p.passed && p.x + p.width < mantis.x) {
                 score++;
                 p.passed = true;
             }
 
-            // Flush out offscreen arrays
             if (p.x + p.width < 0) {
                 pipes.splice(i, 1);
                 continue;
             }
 
-            // --- HITBOX RADIAL BOX DETECTOR ---
-            let buffer = 4; // Tiny inner margin adjustment for fairer mobile hitbox
+            let buffer = 4; 
             let mLeft = mantis.x - mantis.radius + buffer;
             let mRight = mantis.x + mantis.radius - buffer;
             let mTop = mantis.y - mantis.radius + buffer;
@@ -150,16 +153,13 @@ function loop() {
         }
     }
 
-    // 4. DRAW GRAPHICAL ASSETS ON SCREEN
-    // Draw Obstacle Pillars (Arcade Tube Look)
+    // Draw Obstacle Pillars
     pipes.forEach(p => {
-        // Top Pipe
         ctx.fillStyle = "#003566";
         ctx.fillRect(p.x, 0, p.width, p.topHeight);
-        ctx.fillStyle = "#00d4ff"; // Neon rim lining
+        ctx.fillStyle = "#00d4ff"; 
         ctx.fillRect(p.x - 2, p.topHeight - 12, p.width + 4, 12);
         
-        // Bottom Pipe
         ctx.fillStyle = "#003566";
         ctx.fillRect(p.x, canvas.height - p.bottomHeight, p.width, p.bottomHeight);
         ctx.fillStyle = "#00d4ff";
@@ -169,19 +169,18 @@ function loop() {
     // Draw Mantis Character
     ctx.beginPath();
     ctx.arc(mantis.x, mantis.y, mantis.radius, 0, Math.PI * 2);
-    ctx.fillStyle = "#00ea47"; // Glowing Mantis Green
+    ctx.fillStyle = "#00ea47"; 
     ctx.fill();
     ctx.lineWidth = 3;
-    ctx.strokeStyle = "#ffd60a"; // Bright gold accent shield ring
+    ctx.strokeStyle = "#ffd60a"; 
     ctx.stroke();
     ctx.closePath();
 
-    // Render Canvas Standard Interface Text
+    // Render Interface Text
     ctx.fillStyle = "#ffffff";
     ctx.font = "bold 24px Arial";
     ctx.fillText("Score: " + score, 20, 45);
 
-    // Dynamic Display State Prompts
     if (!gameStarted && !gameOver) {
         ctx.fillStyle = "rgba(0,0,0,0.5)";
         ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -207,11 +206,8 @@ function loop() {
         ctx.textAlign = "left";
     }
 
-    // Force engine hardware frames
     requestAnimationFrame(loop);
 }
 
-// FIRE UP CORE ENGINE ACTIVE CALLS
 resetGame();
 loop();
-                
