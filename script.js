@@ -7,7 +7,7 @@ let gap = 170;
 let topHeight = 150;
 let y = 250;
 let velocity = 0;
-let gravity = 0.5;
+let gravity = 0.75;
 let jump = -8;
 let score = 0;
 let scoreBox = document.getElementById("score");
@@ -19,24 +19,24 @@ function update() {
         return;
     }
     
+    function update() {
+    if (gameOver) {
+        return;
+    }
+    
     velocity += gravity;
     y += velocity;
 
-    if(y < 0){
-        y = 0;
-        velocity = 0;
-    }
-
-    if(y > 560){
-        y = 560;
-        velocity = 0;
-    }
+    // ... (keep your boundary checks the same) ...
 
     mantis.style.top = y + "px";
-    pipeX -= 2;
+    
+    // --- CHANGED FOR FASTER PIPES ---
+    pipeX -= 4; // Increased from 2 (Pipes move twice as fast!)
 
     pipeTop.style.left = pipeX + "px";
     pipeBottom.style.left = pipeX + "px";
+        
     
     // --- FIXED COLLISION LOGIC WITH HITBOX PADDING ---
     let padding = 5; // Shaves off 5px from all sides so the player has a fair chance
