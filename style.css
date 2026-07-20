@@ -1,27 +1,86 @@
-#dino {
-    width: 30px;
-    height: 30px;
-    background-color: #00ff88; 
-    position: absolute;
-    bottom: 0;
-    left: 20px;
-    /* Smooth scaling transition */
-    transition: width 0.3s ease, height 0.3s ease;
-}
+body {
+            background-color: #000000;
+            color: #ffffff;
+            font-family: sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 20px;
+        }
 
-#cactus {
-    width: 20px;
-    height: 30px;
-    background-color: #ff3333; 
-    position: absolute;
-    bottom: 0;
-    left: 320px;
-    /* Smooth scaling transition */
-    transition: width 0.3s ease, height 0.3s ease;
-}
+        #game-box {
+            width: 320px; 
+            height: 150px;
+            background-color: #222222;
+            position: relative;
+            margin: 20px auto;
+            border: 3px solid #ffffff;
+            overflow: hidden;
+        }
 
-@keyframes jump {
-    0% { bottom: 0; }
-    50% { bottom: var(--jump-height, 80px); }
-    100% { bottom: 0; }
-} 
+        /* THE DINO (Green Square) */
+        #dino {
+            width: 30px;
+            height: 30px;
+            background-color: #00ff88; 
+            position: absolute;
+            bottom: 0;
+            left: 20px;
+            /* Smooth scaling transition when items shrink */
+            transition: width 0.3s ease, height 0.3s ease;
+        }
+
+        /* THE CACTUS (Red Square) */
+        #cactus {
+            width: 20px;
+            height: 30px;
+            background-color: #ff3333; 
+            position: absolute;
+            bottom: 0;
+            left: 320px;
+            /* Smooth scaling transition when items shrink */
+            transition: width 0.3s ease, height 0.3s ease;
+        }
+
+        /* The trigger class added by JavaScript */
+        .jump-animation {
+            animation: jump 0.5s linear;
+        }
+
+        /* Dynamic Keyframes using global CSS variables */
+        @keyframes jump {
+            0% { bottom: 0; }
+            50% { bottom: var(--jump-height, 80px); }
+            100% { bottom: 0; }
+        }
+
+        #score-board {
+            font-size: 1.2rem;
+            margin-top: 10px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Free Games</h1>
+    
+    <!-- Game Window Layout -->
+    <div id="game-box" onclick="jump()">
+        <div id="dino"></div>
+        <div id="cactus"></div>
+    </div>
+
+    <div id="score-board">Score: <span id="score">0</span></div>
+
+    <!-- Speed Bar Layout -->
+    <div style="margin-top: 10px; font-weight: bold;">
+        Speed Level:
+        <div style="width: 200px; height: 15px; background-color: #444; border: 2px solid #fff; margin: 5px auto; border-radius: 3px; overflow: hidden;">
+            <div id="speed-bar" style="width: 20%; height: 100%; background-color: #00ff88; transition: width 0.3s ease;"></div>
+        </div>
+    </div>
+
+    <p>Tap the dark grey box to jump!</p>
+
+    <script>
+  
