@@ -2,36 +2,23 @@ let mantis = document.getElementById("mantis");
 let pipeTop = document.getElementById("pipeTop");
 let pipeBottom = document.getElementById("pipeBottom");
 
-// Grab the audio elements from your HTML
-let wingSound = document.getElementById("wingSound");
-let pointSound = document.getElementById("pointSound");
-let hitSound = document.getElementById("hitSound");
-
 let pipeX = 350;
-let gap = 170;
+let gap = 150; // Slightly tighter gap for tight, fast maneuvers
 let topHeight = 150;
 let y = 250;
 let velocity = 0;
 
-// --- SNAPPY PHYSICS SPEEDS ---
-let gravity = 0.7;  // Faster fall speed
-let jump = -10;     // Snappier, higher jump
+// --- EXTREME SPEED & PHYSICS ---
+let gravity = 1.2;  // Heavy, aggressive gravity drop
+let jump = -14;     // Powerful, snappy jump force to fight gravity
 let score = 0;
 let scoreBox = document.getElementById("score");
 let scored = false;
 let gameOver = false;
 
-// Handles jump physics and forces audio to play instantly on rapid clicks
 function handleJump() {
     if (gameOver) return;
-    
     velocity = jump;
-    
-    // Reset sound track to 0 so it plays instantly even during fast clicking
-    if (wingSound) {
-        wingSound.currentTime = 0;
-        wingSound.play().catch(e => console.log("Audio waiting for user click"));
-    }
 }
 
 function update() {
@@ -39,6 +26,7 @@ function update() {
         return;
     }
     
+    // Apply heavy physics updates
     velocity += gravity;
     y += velocity;
 
@@ -54,14 +42,14 @@ function update() {
 
     mantis.style.top = y + "px";
     
-    // --- FASTER OBSTACLE SPEED ---
-    pipeX -= 4; // Obstacles now rush at the player twice as fast!
+    // --- LUDICROUS SPEED ---
+    pipeX -= 9; // High-velocity pipe sprint across the screen
 
     pipeTop.style.left = pipeX + "px";
     pipeBottom.style.left = pipeX + "px";
     
-    // Collision logic with hitbox padding
-    let padding = 5; 
+    // Accurate collision detection matching high speed
+    let padding = 6; 
     let mantisLeft = 70 + padding;
     let mantisRight = 70 + 40 - padding; 
     let mantisTop = y + padding;
@@ -77,13 +65,9 @@ function update() {
         (mantisTop < topHeight || mantisBottom > bottomPipeTopY)
     ) {
         gameOver = true;
-        
-        // Play crash sound
-        if (hitSound) hitSound.play();
-        
         setTimeout(() => {
             alert("Game Over!\nScore: " + score);
-        }, 100);
+        }, 50);
         return; 
     }
     
@@ -92,15 +76,9 @@ function update() {
         score++;
         scoreBox.innerHTML = "Score: " + score;
         scored = true;
-        
-        // Play score point sound
-        if (pointSound) {
-            pointSound.currentTime = 0;
-            pointSound.play();
-        }
     }
     
-    // Reset pipe and randomize heights
+    // Reset pipe positions instantly
     if (pipeX < -60) {
         pipeX = 350;
         scored = false;
@@ -125,9 +103,9 @@ document.addEventListener("click", function(){
     handleJump();
 });
 
-// Initialize first pipe heights
+// Initialize heights right away
 pipeTop.style.height = topHeight + "px";
 pipeBottom.style.height = (600 - topHeight - gap) + "px";
 
 update();
-    
+        
