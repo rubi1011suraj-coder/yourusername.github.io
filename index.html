@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+        <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -32,6 +32,7 @@
             position: absolute;
             bottom: 0;
             left: 20px;
+            transition: width 0.3s ease, height 0.3s ease;
         }
 
         /* THE CACTUS (Red Square) */
@@ -42,6 +43,7 @@
             position: absolute;
             bottom: 0;
             left: 320px;
+            transition: width 0.3s ease, height 0.3s ease;
         }
 
         .jump-animation {
@@ -50,7 +52,7 @@
 
         @keyframes jump {
             0% { bottom: 0; }
-            50% { bottom: 80px; }
+            50% { bottom: var(--jump-height, 80px); }
             100% { bottom: 0; }
         }
 
@@ -59,39 +61,101 @@
             margin-top: 10px;
             font-weight: bold;
         }
+
+        /* START / RESTART BUTTON STYLING */
+        #start-btn {
+            background-color: #00ff88;
+            color: #000000;
+            border: none;
+            padding: 12px 28px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-top: 15px;
+            box-shadow: 0px 4px 10px rgba(0, 255, 136, 0.4);
+            transition: transform 0.1s ease, background-color 0.2s ease;
+        }
+
+        #start-btn:active {
+            transform: scale(0.95);
+            background-color: #00cc6d;
+        }
     </style>
 </head>
 <body>
 
     <h1>Free Games</h1>
     
+    <!-- Game Window Layout -->
     <div id="game-box" onclick="jump()">
         <div id="dino"></div>
         <div id="cactus"></div>
     </div>
-<!-- Speed Bar Display -->
-<div style="margin-top: 10px; font-weight: bold;">
-    Speed Level:
-    <div style="width: 200px; height: 15px; background-color: #444; border: 2px solid #fff; margin: 5px auto; border-radius: 3px; overflow: hidden;">
-        <div id="speed-bar" style="width: 20%; height: 100%; background-color: #00ff88; transition: width 0.3s ease;"></div>
-    </div>
-</div>
-    
+
     <div id="score-board">Score: <span id="score">0</span></div>
-    <p>Tap the dark grey box to jump!</p>
+
+    <!-- Speed Bar Layout -->
+    <div style="margin-top: 10px; font-weight: bold;">
+        Speed Level:
+        <div style="width: 200px; height: 15px; background-color: #444; border: 2px solid #fff; margin: 5px auto; border-radius: 3px; overflow: hidden;">
+            <div id="speed-bar" style="width: 20%; height: 100%; background-color: #00ff88; transition: width 0.3s ease;"></div>
+        </div>
+    </div>
+
+    <!-- Start / Restart Button -->
+    <button id="start-btn" onclick="startGame()">Start Game</button>
+
+    <p style="color: #aaa; font-size: 0.9rem;">Tap the dark grey box to jump!</p>
 
     <script>
         const dino = document.getElementById("dino");
         const cactus = document.getElementById("cactus");
         const scoreDisplay = document.getElementById("score");
+        const speedBar = document.getElementById("speed-bar");
+        const startBtn = document.getElementById("start-btn");
 
         let score = 0;
-        let baseSpeed = 4; // Starting speed of the red block
+        let baseSpeed = 4; 
         let currentSpeed = baseSpeed;
-        let isAlive = true;
+        let currentScale = 1;
+        let isAlive = false; // Game starts in paused state
+        let gameRunning = false;
+        let cactusLeft = 320;
+        let animationFrameId;
+
+        function startGame() {
+            if (gameRunning) return; // Prevent multiple clicks
+
+            // Reset game variables
+            score = 0;
+            currentSpeed = baseSpeed;
+            currentScale = 1;
+            cactusLeft = 320;
+            isAlive = true;
+            gameRunning = true;
+
+            // Reset UI elements
+            scoreDisplay.innerText = score;
+            speedBar.style.width = "20%";
+            dino.style.width = "30px";
+            dino.style.height = "30px";
+            cactus.style.width = "20px";
+            cactus.style.height = "30px";
+            cactus.style.left = "320px";
+
+            // Hide the start button while playing
+            startBtn.style.display = "none";
+
+            // Start the movement loop
+            moveEnemy();
+        }
 
         function jump() {
             if (!dino.classList.contains("jump-animation") && isAlive) {
+                let jumpPeak = 80 * (2 - currentScale); 
+                document.documentElement.style.setProperty('--jump-height', jumpPeak + 'px');
+
                 dino.classList.add("jump-animation");
                 
                 setTimeout(function() {
@@ -100,45 +164,46 @@
             }
         }
 
-        let cactusLeft = 320;
-        
         function moveEnemy() {
             if (!isAlive) return;
 
-            cactusLeft -= currentSpeed; // Moves using the dynamic speed variable
+            cactusLeft -= currentSpeed; 
             
             if (cactusLeft < -20) {
-                cactusLeft = 320; // Reset position
+                cactusLeft = 320; 
                 score++;
                 scoreDisplay.innerText = score;
 
-                // EVERY 5 POINTS: Increase speed by 1
                 if (score > 0 && score % 5 === 0) {
                     currentSpeed += 1; 
-                    console.log("Speed increased! Current speed: " + currentSpeed);
+                    speedBar.style.width = Math.min(100, (currentSpeed / baseSpeed) * 20) + "%";
+                    currentScale = Math.max(0.5, currentScale - 0.15); 
+                    
+                    dino.style.width = (30 * currentScale) + "px";
+                    dino.style.height = (30 * currentScale) + "px";
+                    cactus.style.width = (20 * currentScale) + "px";
+                    cactus.style.height = (30 * currentScale) + "px";
                 }
             }
             
             cactus.style.left = cactusLeft + "px";
             
-            // Collision check
+            // Impact Detection Calculation
             let dinoBottom = parseInt(window.getComputedStyle(dino).getPropertyValue("bottom"));
-            if (cactusLeft > 20 && cactusLeft < 50 && dinoBottom < 30) {
+            if (cactusLeft > 20 && cactusLeft < (20 + (30 * currentScale)) && dinoBottom < (30 * currentScale)) {
                 isAlive = false;
+                gameRunning = false;
+
+                // Show restart button
+                startBtn.innerText = "Play Again";
+                startBtn.style.display = "inline-block";
+
                 alert("Game Over! Final Score: " + score);
-                
-                // Reset everything back to start configurations
-                score = 0;
-                currentSpeed = baseSpeed;
-                scoreDisplay.innerText = score;
-                cactusLeft = 320;
-                isAlive = true;
+                return;
             }
 
-            requestAnimationFrame(moveEnemy);
+            animationFrameId = requestAnimationFrame(moveEnemy);
         }
-
-        moveEnemy();
     </script>
 
 </body>
