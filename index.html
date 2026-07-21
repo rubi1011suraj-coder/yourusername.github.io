@@ -1,48 +1,88 @@
-        <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Free Games</title>
+    <title>Free Games - Java Runner</title>
     <style>
         body {
-            background-color: #000000;
+            background: #080812; /* Deep space dark background */
             color: #ffffff;
-            font-family: sans-serif;
+            font-family: 'Courier New', Courier, monospace;
             text-align: center;
             margin: 0;
             padding: 20px;
         }
 
-        #game-box {
-            width: 320px; 
-            height: 150px;
-            background-color: #222222;
-            position: relative;
-            margin: 20px auto;
-            border: 3px solid #ffffff;
-            overflow: hidden;
+        h1 {
+            color: #00ff88;
+            text-shadow: 0px 0px 10px #00ff88;
+            letter-spacing: 2px;
+            margin-bottom: 10px;
         }
 
-        /* THE DINO (Green Square) */
+        /* STYLED GAME BOX WITH RETRO BACKGROUND */
+        #game-box {
+            width: 320px; 
+            height: 160px;
+            position: relative;
+            margin: 15px auto;
+            border: 3px solid #ffffff;
+            border-radius: 6px;
+            overflow: hidden;
+            box-shadow: 0px 0px 20px rgba(0, 255, 136, 0.2);
+            
+            /* Pixelated Night Sky Background */
+            background: linear-gradient(180deg, #050515 0%, #111133 70%, #221133 100%);
+            transition: background 0.8s ease, box-shadow 0.8s ease;
+        }
+
+        /* Moon graphic inside game box */
+        #game-box::before {
+            content: '';
+            position: absolute;
+            top: 15px;
+            right: 25px;
+            width: 24px;
+            height: 24px;
+            background-color: #ffffaa;
+            border-radius: 50%;
+            box-shadow: 0px 0px 12px #ffffaa;
+        }
+
+        /* Ground Line */
+        .ground-line {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            height: 4px;
+            background-color: #55ff55;
+            box-shadow: 0px -2px 6px #55ff55;
+        }
+
+        /* THE DINO (Green Player) */
         #dino {
             width: 30px;
             height: 30px;
             background-color: #00ff88; 
+            border-radius: 3px;
             position: absolute;
-            bottom: 0;
+            bottom: 4px;
             left: 20px;
+            box-shadow: 0px 0px 8px #00ff88;
             transition: width 0.3s ease, height 0.3s ease;
         }
 
-        /* THE CACTUS (Red Square) */
+        /* THE CACTUS (Red Obstacle) */
         #cactus {
             width: 20px;
             height: 30px;
             background-color: #ff3333; 
+            border-radius: 2px;
             position: absolute;
-            bottom: 0;
+            bottom: 4px;
             left: 320px;
+            box-shadow: 0px 0px 8px #ff3333;
             transition: width 0.3s ease, height 0.3s ease;
         }
 
@@ -51,9 +91,15 @@
         }
 
         @keyframes jump {
-            0% { bottom: 0; }
-            50% { bottom: var(--jump-height, 80px); }
-            100% { bottom: 0; }
+            0% { bottom: 4px; }
+            50% { bottom: var(--jump-height, 84px); }
+            100% { bottom: 4px; }
+        }
+
+        /* HYPER SURVIVAL MODE BACKGROUND (Triggers at Score 35) */
+        #game-box.hyper-mode {
+            background: linear-gradient(180deg, #2b0036 0%, #4a004e 60%, #ff0055 100%);
+            box-shadow: 0px 0px 25px #ff0055;
         }
 
         #score-board {
@@ -62,51 +108,58 @@
             font-weight: bold;
         }
 
-        /* START / RESTART BUTTON STYLING */
+        #mode-status {
+            font-size: 0.9rem;
+            color: #888;
+            height: 20px;
+            margin-top: 5px;
+        }
+
+        /* START / RESTART BUTTON */
         #start-btn {
             background-color: #00ff88;
             color: #000000;
             border: none;
             padding: 12px 28px;
-            font-size: 1.1rem;
+            font-size: 1rem;
             font-weight: bold;
+            font-family: inherit;
             border-radius: 6px;
             cursor: pointer;
-            margin-top: 15px;
+            margin-top: 10px;
             box-shadow: 0px 4px 10px rgba(0, 255, 136, 0.4);
             transition: transform 0.1s ease, background-color 0.2s ease;
         }
 
         #start-btn:active {
             transform: scale(0.95);
-            background-color: #00cc6d;
         }
     </style>
 </head>
 <body>
 
-    <h1>Free Games</h1>
+    <h1>JAVA RUNNER</h1>
     
-    <!-- Game Window Layout -->
     <div id="game-box" onclick="jump()">
         <div id="dino"></div>
         <div id="cactus"></div>
+        <div class="ground-line"></div>
     </div>
 
-    <div id="score-board">Score: <span id="score">0</span></div>
+    <div id="score-board">SCORE: <span id="score">0</span></div>
+    <div id="mode-status">CLASSIC MODE</div>
 
-    <!-- Speed Bar Layout -->
-    <div style="margin-top: 10px; font-weight: bold;">
-        Speed Level:
-        <div style="width: 200px; height: 15px; background-color: #444; border: 2px solid #fff; margin: 5px auto; border-radius: 3px; overflow: hidden;">
+    <!-- Speed Bar Indicator -->
+    <div style="margin-top: 10px; font-weight: bold; font-size: 0.85rem;">
+        SPEED LEVEL
+        <div style="width: 200px; height: 12px; background-color: #222; border: 2px solid #555; margin: 5px auto; border-radius: 4px; overflow: hidden;">
             <div id="speed-bar" style="width: 20%; height: 100%; background-color: #00ff88; transition: width 0.3s ease;"></div>
         </div>
     </div>
 
-    <!-- Start / Restart Button -->
     <button id="start-btn" onclick="startGame()">Start Game</button>
 
-    <p style="color: #aaa; font-size: 0.9rem;">Tap the dark grey box to jump!</p>
+    <p style="color: #888; font-size: 0.8rem;">Tap inside the game box to jump!</p>
 
     <script>
         const dino = document.getElementById("dino");
@@ -114,40 +167,46 @@
         const scoreDisplay = document.getElementById("score");
         const speedBar = document.getElementById("speed-bar");
         const startBtn = document.getElementById("start-btn");
+        const gameBox = document.getElementById("game-box");
+        const modeStatus = document.getElementById("mode-status");
 
         let score = 0;
         let baseSpeed = 4; 
         let currentSpeed = baseSpeed;
+        let maxSpeed = 8.5; // Cap speed so score 35+ remains beatable!
         let currentScale = 1;
-        let isAlive = false; // Game starts in paused state
+        let isAlive = false; 
         let gameRunning = false;
         let cactusLeft = 320;
-        let animationFrameId;
+        let isHyperMode = false;
 
         function startGame() {
-            if (gameRunning) return; // Prevent multiple clicks
+            if (gameRunning) return;
 
-            // Reset game variables
+            // Reset game configurations
             score = 0;
             currentSpeed = baseSpeed;
             currentScale = 1;
             cactusLeft = 320;
             isAlive = true;
             gameRunning = true;
+            isHyperMode = false;
 
-            // Reset UI elements
+            // Reset UI
             scoreDisplay.innerText = score;
             speedBar.style.width = "20%";
+            speedBar.style.backgroundColor = "#00ff88";
+            modeStatus.innerText = "CLASSIC MODE";
+            modeStatus.style.color = "#888";
+            gameBox.classList.remove("hyper-mode");
+
             dino.style.width = "30px";
             dino.style.height = "30px";
             cactus.style.width = "20px";
             cactus.style.height = "30px";
             cactus.style.left = "320px";
 
-            // Hide the start button while playing
             startBtn.style.display = "none";
-
-            // Start the movement loop
             moveEnemy();
         }
 
@@ -169,32 +228,52 @@
 
             cactusLeft -= currentSpeed; 
             
-            if (cactusLeft < -20) {
+            if (cactusLeft < -25) {
                 cactusLeft = 320; 
                 score++;
                 scoreDisplay.innerText = score;
 
-                if (score > 0 && score % 5 === 0) {
-                    currentSpeed += 1; 
-                    speedBar.style.width = Math.min(100, (currentSpeed / baseSpeed) * 20) + "%";
-                    currentScale = Math.max(0.5, currentScale - 0.15); 
+                // Speed increases every 5 points UNTIL it hits maxSpeed (8.5)
+                if (score > 0 && score % 5 === 0 && currentSpeed < maxSpeed) {
+                    currentSpeed += 0.8; 
+                    speedBar.style.width = Math.min(100, (currentSpeed / maxSpeed) * 100) + "%";
+                    
+                    currentScale = Math.max(0.55, currentScale - 0.1); 
                     
                     dino.style.width = (30 * currentScale) + "px";
                     dino.style.height = (30 * currentScale) + "px";
-                    cactus.style.width = (20 * currentScale) + "px";
-                    cactus.style.height = (30 * currentScale) + "px";
                 }
+
+                // ENTER HYPER SURVIVAL MODE AT SCORE 35
+                if (score >= 35) {
+                    if (!isHyperMode) {
+                        isHyperMode = true;
+                        gameBox.classList.add("hyper-mode");
+                        modeStatus.innerText = "🔥 HYPER SURVIVAL MODE 🔥";
+                        modeStatus.style.color = "#ff0055";
+                        speedBar.style.backgroundColor = "#ff0055";
+                    }
+
+                    // Vary obstacle width slightly to challenge timing instead of impossible speed
+                    let randomWidth = Math.floor(Math.random() * 12) + 16; 
+                    cactus.style.width = (randomWidth * currentScale) + "px";
+                } else {
+                    cactus.style.width = (20 * currentScale) + "px";
+                }
+
+                cactus.style.height = (30 * currentScale) + "px";
             }
             
             cactus.style.left = cactusLeft + "px";
             
-            // Impact Detection Calculation
+            // Collision Detection
             let dinoBottom = parseInt(window.getComputedStyle(dino).getPropertyValue("bottom"));
-            if (cactusLeft > 20 && cactusLeft < (20 + (30 * currentScale)) && dinoBottom < (30 * currentScale)) {
+            let currentCactusWidth = parseInt(cactus.style.width);
+
+            if (cactusLeft > 15 && cactusLeft < (20 + (30 * currentScale)) && dinoBottom < (30 * currentScale)) {
                 isAlive = false;
                 gameRunning = false;
 
-                // Show restart button
                 startBtn.innerText = "Play Again";
                 startBtn.style.display = "inline-block";
 
@@ -202,7 +281,7 @@
                 return;
             }
 
-            animationFrameId = requestAnimationFrame(moveEnemy);
+            requestAnimationFrame(moveEnemy);
         }
     </script>
 
