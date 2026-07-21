@@ -15,8 +15,8 @@
         // Jump Execution Physics
         function jump() {
             if (!dino.classList.contains("jump-animation") && isAlive) {
-                // Calculate dynamic jump peak (goes higher as character shrinks)
-                let jumpPeak = 80 * (2 - currentScale); 
+                // Boosted jump height (175px starting peak instead of 110px)
+                let jumpPeak = 175 * (2 - currentScale); 
                 
                 // Set the value globally so the CSS keyframe reads it immediately
                 document.documentElement.style.setProperty('--jump-height', jumpPeak + 'px');
