@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Free Games - Java Runner</title>
+    <title>Free Games - Sky Runner</title>
     <style>
         body {
-            background-color: #000000;
+            background-color: #111;
             color: #ffffff;
             font-family: sans-serif;
             text-align: center;
@@ -14,15 +14,61 @@
             padding: 20px;
         }
 
+        /* BRIGHT BLUE SKY GAME BOX */
         #game-box {
             width: 320px; 
-            height: 150px;
-            background-color: #222222;
+            height: 160px;
             position: relative;
             margin: 15px auto;
             border: 3px solid #ffffff;
+            border-radius: 8px;
             overflow: hidden;
-            border-radius: 6px;
+            box-shadow: 0px 4px 15px rgba(0, 183, 255, 0.4);
+            
+            /* Bright Blue Sky Gradient */
+            background: linear-gradient(180deg, #3a9bdc 0%, #87ceeb 70%, #e0f6ff 100%);
+        }
+
+        /* GLOWING SUN */
+        .sun {
+            position: absolute;
+            top: 15px;
+            right: 25px;
+            width: 30px;
+            height: 30px;
+            background: #ffde59;
+            border-radius: 50%;
+            box-shadow: 0px 0px 15px #ffde59, 0px 0px 30px #ff9900;
+        }
+
+        /* DRIFTING CLOUDS */
+        .cloud {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.85);
+            border-radius: 20px;
+        }
+        .cloud-1 {
+            width: 50px;
+            height: 16px;
+            top: 25px;
+            left: 30px;
+            box-shadow: 10px -6px 0 2px rgba(255, 255, 255, 0.85);
+        }
+        .cloud-2 {
+            width: 40px;
+            height: 14px;
+            top: 50px;
+            left: 170px;
+            box-shadow: 8px -5px 0 1px rgba(255, 255, 255, 0.85);
+        }
+
+        /* GROUND LINE */
+        .ground-line {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            height: 6px;
+            background-color: #55aa33;
         }
 
         /* THE DINO (Green Square) */
@@ -30,9 +76,12 @@
             width: 30px;
             height: 30px;
             background-color: #00ff88; 
+            border: 2px solid #009944;
+            border-radius: 4px;
             position: absolute;
-            bottom: 0;
+            bottom: 6px;
             left: 20px;
+            box-shadow: 0px 0px 6px rgba(0,0,0,0.3);
             transition: width 0.3s ease, height 0.3s ease, opacity 0.1s ease;
         }
 
@@ -47,8 +96,10 @@
             width: 20px;
             height: 30px;
             background-color: #ff3333; 
+            border: 2px solid #990000;
+            border-radius: 3px;
             position: absolute;
-            bottom: 0;
+            bottom: 6px;
             left: 320px;
             transition: width 0.3s ease, height 0.3s ease;
         }
@@ -58,9 +109,9 @@
         }
 
         @keyframes jump {
-            0% { bottom: 0; }
+            0% { bottom: 6px; }
             50% { bottom: var(--jump-height, 175px); }
-            100% { bottom: 0; }
+            100% { bottom: 6px; }
         }
 
         /* STATS PANEL */
@@ -84,6 +135,8 @@
 
         #score-board {
             color: #ffff55;
+            font-size: 1.1rem;
+            font-weight: bold;
         }
 
         /* START / RESTART BUTTON */
@@ -97,6 +150,11 @@
             border-radius: 6px;
             cursor: pointer;
             margin-top: 10px;
+            box-shadow: 0px 4px 10px rgba(0, 255, 136, 0.4);
+        }
+
+        #start-btn:active {
+            transform: scale(0.95);
         }
     </style>
 </head>
@@ -104,13 +162,17 @@
 
     <h1>Free Games</h1>
     
-    <!-- Game Box -->
+    <!-- Blue Sky Game Box -->
     <div id="game-box" onclick="jump()">
+        <div class="sun"></div>
+        <div class="cloud cloud-1"></div>
+        <div class="cloud cloud-2"></div>
         <div id="dino"></div>
         <div id="cactus"></div>
+        <div class="ground-line"></div>
     </div>
 
-    <!-- HUD / Stats Display -->
+    <!-- Stats HUD -->
     <div class="stats-panel">
         <div>HEALTH: <span id="health-bar">❤️❤️❤️</span></div>
         <div>DIST: <span id="distance-board">0</span>m</div>
@@ -144,6 +206,7 @@
         let lives = 3;
         let baseSpeed = 4; 
         let currentSpeed = baseSpeed;
+        let maxSpeed = 8; // STRICT SPEED CAP so game stays beatable!
         let currentScale = 1;
         let isAlive = false; 
         let gameRunning = false;
@@ -160,7 +223,7 @@
         function startGame() {
             if (gameRunning) return;
 
-            // Reset Variables
+            // Reset Game Logic
             score = 0;
             distance = 0;
             lives = 3;
@@ -171,7 +234,7 @@
             gameRunning = true;
             isInvulnerable = false;
 
-            // Reset UI
+            // Reset Displays
             scoreDisplay.innerText = score;
             distanceDisplay.innerText = distance;
             updateHealthUI();
@@ -210,17 +273,20 @@
             distance += Math.floor(currentSpeed / 2);
             distanceDisplay.innerText = distance;
 
-            // Obstacle passed successfully
+            // Obstacle cleared
             if (cactusLeft < -20) {
                 cactusLeft = 320; 
                 score++;
                 scoreDisplay.innerText = score;
 
-                // EVERY 5 POINTS: Increase speed and shrink scale
+                // EVERY 5 POINTS: Increase speed up to maxSpeed limit (8.0)
                 if (score > 0 && score % 5 === 0) {
-                    currentSpeed += 1; 
-                    speedBar.style.width = Math.min(100, (currentSpeed / baseSpeed) * 20) + "%";
-                    currentScale = Math.max(0.5, currentScale - 0.15); 
+                    if (currentSpeed < maxSpeed) {
+                        currentSpeed += 0.5; // Gentler speed increase
+                    }
+
+                    speedBar.style.width = Math.min(100, (currentSpeed / maxSpeed) * 100) + "%";
+                    currentScale = Math.max(0.5, currentScale - 0.1); 
                     
                     dino.style.width = (30 * currentScale) + "px";
                     dino.style.height = (30 * currentScale) + "px";
@@ -247,7 +313,7 @@
                     alert("Game Over! Final Score: " + score + " | Distance: " + distance + "m");
                     return;
                 } else {
-                    // HIT BUT STILL HAS LIVES -> Brief Invulnerability (1 second)
+                    // HIT BUT HAS LIVES LEFT -> 1 second invulnerability
                     isInvulnerable = true;
                     dino.classList.add("invulnerable");
 
