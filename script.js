@@ -73,8 +73,7 @@ ctx.beginPath();
 ctx.moveTo(0, canvas.height);
 
 for (let x = 0; x <= canvas.width; x++) {
-    let y = canvas.height - 120 + Math.sin((x + distance) * 0.02) * 40;
-    ctx.lineTo(x, y);
+    let y = canvas.height - 180 + Math.sin((x + distance) * 0.01) * 80;
 }
 
 ctx.lineTo(canvas.width, canvas.height);
