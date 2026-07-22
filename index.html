@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Free Games - Sky Runner</title>
+    <title>Free Games - Space Runner</title>
     <style>
         body {
             background-color: #111;
@@ -14,10 +14,10 @@
             padding: 20px;
         }
 
-        /* BRIGHT BLUE SKY GAME BOX */
+        /* GAME BOX CONTAINER */
         #game-box {
             width: 320px; 
-            height: 160px;
+            height: 180px;
             position: relative;
             margin: 15px auto;
             border: 3px solid #ffffff;
@@ -27,9 +27,16 @@
             
             /* Bright Blue Sky Gradient */
             background: linear-gradient(180deg, #3a9bdc 0%, #87ceeb 70%, #e0f6ff 100%);
+            transition: background 1.5s ease;
         }
 
-        /* GLOWING SUN */
+        /* MOON ENVIRONMENT MODE (Triggers at 10,000m) */
+        #game-box.moon-mode {
+            background: linear-gradient(180deg, #020208 0%, #0d0d2b 70%, #202040 100%) !important;
+            box-shadow: 0px 0px 20px rgba(180, 0, 255, 0.5);
+        }
+
+        /* ENVIRONMENT GRAPHICS */
         .sun {
             position: absolute;
             top: 15px;
@@ -38,29 +45,36 @@
             height: 30px;
             background: #ffde59;
             border-radius: 50%;
-            box-shadow: 0px 0px 15px #ffde59, 0px 0px 30px #ff9900;
+            box-shadow: 0px 0px 15px #ffde59;
+            transition: opacity 1s ease;
         }
 
-        /* DRIFTING CLOUDS */
+        .moon-graphic {
+            position: absolute;
+            top: 15px;
+            right: 25px;
+            width: 35px;
+            height: 35px;
+            background: #e6e6e6;
+            border-radius: 50%;
+            box-shadow: 0px 0px 15px #ffffff;
+            opacity: 0;
+            transition: opacity 1s ease;
+        }
+
+        #game-box.moon-mode .sun { opacity: 0; }
+        #game-box.moon-mode .moon-graphic { opacity: 1; }
+
         .cloud {
             position: absolute;
             background: rgba(255, 255, 255, 0.85);
             border-radius: 20px;
+            transition: opacity 1s ease;
         }
-        .cloud-1 {
-            width: 50px;
-            height: 16px;
-            top: 25px;
-            left: 30px;
-            box-shadow: 10px -6px 0 2px rgba(255, 255, 255, 0.85);
-        }
-        .cloud-2 {
-            width: 40px;
-            height: 14px;
-            top: 50px;
-            left: 170px;
-            box-shadow: 8px -5px 0 1px rgba(255, 255, 255, 0.85);
-        }
+        .cloud-1 { width: 50px; height: 16px; top: 25px; left: 30px; }
+        .cloud-2 { width: 40px; height: 14px; top: 50px; left: 170px; }
+
+        #game-box.moon-mode .cloud { opacity: 0; }
 
         /* GROUND LINE */
         .ground-line {
@@ -69,9 +83,14 @@
             width: 100%;
             height: 6px;
             background-color: #55aa33;
+            transition: background-color 1s ease;
         }
 
-        /* THE DINO (Green Square) */
+        #game-box.moon-mode .ground-line {
+            background-color: #8888aa; /* Moon Dust */
+        }
+
+        /* THE DINO (Green Player) */
         #dino {
             width: 30px;
             height: 30px;
@@ -85,13 +104,12 @@
             transition: width 0.3s ease, height 0.3s ease, opacity 0.1s ease;
         }
 
-        /* Flashing effect when hit */
         .invulnerable {
             background-color: #ffaa00 !important;
             opacity: 0.5;
         }
 
-        /* THE CACTUS (Red Square) */
+        /* ENEMY (Cactus / Alien) */
         #cactus {
             width: 20px;
             height: 30px;
@@ -101,20 +119,30 @@
             position: absolute;
             bottom: 6px;
             left: 320px;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             transition: width 0.3s ease, height 0.3s ease;
         }
 
+        #game-box.moon-mode #cactus {
+            background-color: #a020f0; /* Alien Purple */
+            border-color: #d87093;
+            box-shadow: 0px 0px 8px #a020f0;
+        }
+
         .jump-animation {
-            animation: jump 0.5s linear;
+            animation: jump 0.6s ease-in-out;
         }
 
         @keyframes jump {
             0% { bottom: 6px; }
-            50% { bottom: var(--jump-height, 175px); }
+            50% { bottom: var(--jump-height, 130px); }
             100% { bottom: 6px; }
         }
 
-        /* STATS PANEL */
+        /* HUD & STATS */
         .stats-panel {
             display: flex;
             justify-content: space-around;
@@ -124,22 +152,12 @@
             font-weight: bold;
         }
 
-        #health-bar {
-            color: #ff3333;
-            letter-spacing: 2px;
-        }
+        #health-bar { color: #ff3333; letter-spacing: 2px; }
+        #distance-board { color: #00ccff; }
+        #score-board { color: #ffff55; font-size: 1.1rem; font-weight: bold; }
+        #location-tag { color: #00ff88; font-weight: bold; margin-top: 5px; height: 20px; }
 
-        #distance-board {
-            color: #00ccff;
-        }
-
-        #score-board {
-            color: #ffff55;
-            font-size: 1.1rem;
-            font-weight: bold;
-        }
-
-        /* START / RESTART BUTTON */
+        /* START BUTTON */
         #start-btn {
             background-color: #00ff88;
             color: #000000;
@@ -153,24 +171,24 @@
             box-shadow: 0px 4px 10px rgba(0, 255, 136, 0.4);
         }
 
-        #start-btn:active {
-            transform: scale(0.95);
-        }
+        #start-btn:active { transform: scale(0.95); }
     </style>
 </head>
 <body>
 
     <h1>Free Games</h1>
     
-    <!-- Blue Sky Game Box -->
     <div id="game-box" onclick="jump()">
         <div class="sun"></div>
+        <div class="moon-graphic"></div>
         <div class="cloud cloud-1"></div>
         <div class="cloud cloud-2"></div>
         <div id="dino"></div>
         <div id="cactus"></div>
         <div class="ground-line"></div>
     </div>
+
+    <div id="location-tag">EARTH ATMOSPHERE</div>
 
     <!-- Stats HUD -->
     <div class="stats-panel">
@@ -190,7 +208,7 @@
 
     <button id="start-btn" onclick="startGame()">Start Game</button>
 
-    <p style="color: #aaa; font-size: 0.85rem;">Tap the box to jump!</p>
+    <p style="color: #aaa; font-size: 0.85rem;">Tap inside the box to jump!</p>
 
     <script>
         const dino = document.getElementById("dino");
@@ -200,18 +218,21 @@
         const healthDisplay = document.getElementById("health-bar");
         const speedBar = document.getElementById("speed-bar");
         const startBtn = document.getElementById("start-btn");
+        const gameBox = document.getElementById("game-box");
+        const locationTag = document.getElementById("location-tag");
 
         let score = 0;
         let distance = 0;
         let lives = 3;
         let baseSpeed = 4; 
         let currentSpeed = baseSpeed;
-        let maxSpeed = 8; // STRICT SPEED CAP so game stays beatable!
+        let maxSpeed = 8; 
         let currentScale = 1;
         let isAlive = false; 
         let gameRunning = false;
         let isInvulnerable = false;
         let cactusLeft = 320;
+        let isMoonMode = false;
 
         function updateHealthUI() {
             if (lives === 3) healthDisplay.innerText = "❤️❤️❤️";
@@ -223,7 +244,7 @@
         function startGame() {
             if (gameRunning) return;
 
-            // Reset Game Logic
+            // Reset Logic
             score = 0;
             distance = 0;
             lives = 3;
@@ -233,12 +254,17 @@
             isAlive = true;
             gameRunning = true;
             isInvulnerable = false;
+            isMoonMode = false;
 
-            // Reset Displays
+            // Reset UI
             scoreDisplay.innerText = score;
             distanceDisplay.innerText = distance;
+            locationTag.innerText = "EARTH ATMOSPHERE";
+            locationTag.style.color = "#00ff88";
             updateHealthUI();
+            
             speedBar.style.width = "20%";
+            gameBox.classList.remove("moon-mode");
             dino.classList.remove("invulnerable");
 
             dino.style.width = "30px";
@@ -246,6 +272,7 @@
             cactus.style.width = "20px";
             cactus.style.height = "30px";
             cactus.style.left = "320px";
+            cactus.innerText = "";
 
             startBtn.style.display = "none";
             moveEnemy();
@@ -253,14 +280,16 @@
 
         function jump() {
             if (!dino.classList.contains("jump-animation") && isAlive) {
-                let jumpPeak = 175 * (2 - currentScale); 
+                // High Jump inside frame bounds
+                let jumpPeak = isMoonMode ? 140 : 120; 
+
                 document.documentElement.style.setProperty('--jump-height', jumpPeak + 'px');
 
                 dino.classList.add("jump-animation");
                 
                 setTimeout(function() {
                     dino.classList.remove("jump-animation");
-                }, 500);
+                }, 600);
             }
         }
 
@@ -269,58 +298,66 @@
 
             cactusLeft -= currentSpeed; 
             
-            // Distance counter increases smoothly based on speed
-            distance += Math.floor(currentSpeed / 2);
+            // Fast distance counter (Reaches 10,000m quickly)
+            distance += Math.floor(currentSpeed * 2);
             distanceDisplay.innerText = distance;
 
-            // Obstacle cleared
-            if (cactusLeft < -20) {
+            // TRIGGER MOON MODE AT 10,000 METERS!
+            if (distance >= 10000 && !isMoonMode) {
+                isMoonMode = true;
+                gameBox.classList.add("moon-mode");
+                locationTag.innerText = "🌕 MOON EXPLORATION MODE";
+                locationTag.style.color = "#a020f0";
+                cactus.innerText = "👽"; 
+            }
+
+            // Obstacle reset when it passes screen
+            if (cactusLeft < -25) {
                 cactusLeft = 320; 
                 score++;
                 scoreDisplay.innerText = score;
 
-                // EVERY 5 POINTS: Increase speed up to maxSpeed limit (8.0)
                 if (score > 0 && score % 5 === 0) {
                     if (currentSpeed < maxSpeed) {
-                        currentSpeed += 0.5; // Gentler speed increase
+                        currentSpeed += 0.5;
                     }
-
                     speedBar.style.width = Math.min(100, (currentSpeed / maxSpeed) * 100) + "%";
-                    currentScale = Math.max(0.5, currentScale - 0.1); 
-                    
-                    dino.style.width = (30 * currentScale) + "px";
-                    dino.style.height = (30 * currentScale) + "px";
-                    cactus.style.width = (20 * currentScale) + "px";
-                    cactus.style.height = (30 * currentScale) + "px";
                 }
             }
             
             cactus.style.left = cactusLeft + "px";
             
-            // Collision Detection
+            // Collision Detection & Alien Stomp
             let dinoBottom = parseInt(window.getComputedStyle(dino).getPropertyValue("bottom"));
-            
-            if (!isInvulnerable && cactusLeft > 20 && cactusLeft < (20 + (30 * currentScale)) && dinoBottom < (30 * currentScale)) {
-                lives--;
-                updateHealthUI();
 
-                if (lives <= 0) {
-                    // GAME OVER
-                    isAlive = false;
-                    gameRunning = false;
-                    startBtn.innerText = "Play Again";
-                    startBtn.style.display = "inline-block";
-                    alert("Game Over! Final Score: " + score + " | Distance: " + distance + "m");
-                    return;
-                } else {
-                    // HIT BUT HAS LIVES LEFT -> 1 second invulnerability
-                    isInvulnerable = true;
-                    dino.classList.add("invulnerable");
+            if (cactusLeft > 15 && cactusLeft < 45) {
+                // ALIEN STOMP CHECK (If dino lands on top of Alien)
+                if (isMoonMode && dinoBottom > 15) {
+                    score += 5; // Bonus Points!
+                    scoreDisplay.innerText = score;
+                    cactusLeft = 320; // Squash Alien and spawn new one
+                } 
+                // NORMAL SIDE COLLISION
+                else if (!isInvulnerable && dinoBottom < 25) {
+                    lives--;
+                    updateHealthUI();
 
-                    setTimeout(function() {
-                        isInvulnerable = false;
-                        dino.classList.remove("invulnerable");
-                    }, 1000);
+                    if (lives <= 0) {
+                        isAlive = false;
+                        gameRunning = false;
+                        startBtn.innerText = "Play Again";
+                        startBtn.style.display = "inline-block";
+                        alert("Game Over! Final Score: " + score + " | Distance: " + distance + "m");
+                        return;
+                    } else {
+                        isInvulnerable = true;
+                        dino.classList.add("invulnerable");
+
+                        setTimeout(function() {
+                            isInvulnerable = false;
+                            dino.classList.remove("invulnerable");
+                        }, 1000);
+                    }
                 }
             }
 
@@ -329,4 +366,5 @@
     </script>
 
 </body>
-</html>
+    </html>
+    
