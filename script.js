@@ -66,10 +66,20 @@ function gameLoop() {
     ctx.fillStyle = "#87CEEB";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    // Ground
-    ctx.fillStyle = "#4CAF50";
-    ctx.fillRect(0, canvas.height - 120, canvas.width, 120);
+    // Hills
+ctx.fillStyle = "#4CAF50";
+ctx.beginPath();
 
+ctx.moveTo(0, canvas.height);
+
+for (let x = 0; x <= canvas.width; x++) {
+    let y = canvas.height - 120 + Math.sin((x + distance) * 0.02) * 40;
+    ctx.lineTo(x, y);
+}
+
+ctx.lineTo(canvas.width, canvas.height);
+ctx.closePath();
+ctx.fill();
     // Car body
     ctx.fillStyle = "red";
     ctx.fillRect(carX, canvas.height - 170, 90, 35);
