@@ -1,8 +1,12 @@
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
 
-canvas.width = window.innerWidth;
-canvas.height = window.innerHeight;
+function resize() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+}
+resize();
+window.addEventListener("resize", resize);
 
 let carX = 100;
 let speed = 0;
@@ -14,11 +18,32 @@ let brake = false;
 const gasBtn = document.getElementById("gas");
 const brakeBtn = document.getElementById("brake");
 
-gasBtn.addEventListener("touchstart", () => gas = true);
-gasBtn.addEventListener("touchend", () => gas = false);
+function pressGas(e) {
+    e.preventDefault();
+    gas = true;
+}
+function releaseGas(e) {
+    e.preventDefault();
+    gas = false;
+}
+function pressBrake(e) {
+    e.preventDefault();
+    brake = true;
+}
+function releaseBrake(e) {
+    e.preventDefault();
+    brake = false;
+}
 
-brakeBtn.addEventListener("touchstart", () => brake = true);
-brakeBtn.addEventListener("touchend", () => brake = false);
+gasBtn.addEventListener("touchstart", pressGas);
+gasBtn.addEventListener("touchend", releaseGas);
+gasBtn.addEventListener("mousedown", pressGas);
+gasBtn.addEventListener("mouseup", releaseGas);
+
+brakeBtn.addEventListener("touchstart", pressBrake);
+brakeBtn.addEventListener("touchend", releaseBrake);
+brakeBtn.addEventListener("mousedown", pressBrake);
+brakeBtn.addEventListener("mouseup", releaseBrake);
 
 function gameLoop() {
 
@@ -35,4 +60,14 @@ function gameLoop() {
     document.getElementById("distance").textContent =
         "Distance: " + Math.floor(distance) + " m";
 
-    ctx.clearRect(0,0
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // Sky
+    ctx.fillStyle = "#87CEEB";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    // Ground
+    ctx.fillStyle = "#4CAF50";
+    ctx.fillRect(0, canvas.height - 120, canvas.width, 120);
+
+    //
