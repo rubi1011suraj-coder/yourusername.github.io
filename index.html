@@ -9,12 +9,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 
     <style>
-        /* ========================================================
-           GLOBAL & NAVIGATION STYLES
-           ======================================================== */
-        * {
-            box-sizing: border-box;
-        }
+        * { box-sizing: border-box; }
 
         body {
             background-color: #0d0d15;
@@ -27,7 +22,7 @@
             user-select: none;
         }
 
-        /* DESKTOP SITE / DISPLAY NOTICE BANNER */
+        /* NOTICE BANNER */
         #mobile-notice {
             background: linear-gradient(90deg, #ff9900, #ff5500);
             color: #ffffff;
@@ -38,11 +33,6 @@
             align-items: center;
             justify-content: center;
             gap: 10px;
-            box-shadow: 0px 2px 10px rgba(255, 153, 0, 0.4);
-        }
-
-        #mobile-notice span {
-            flex: 1;
         }
 
         .close-notice-btn {
@@ -57,7 +47,7 @@
             font-weight: bold;
         }
 
-        /* TOP ARCADE MENU BAR */
+        /* TOP NAV BAR */
         #arcade-nav {
             background: #181828;
             padding: 12px;
@@ -65,8 +55,6 @@
             display: flex;
             justify-content: center;
             gap: 15px;
-            box-shadow: 0px 4px 15px rgba(0, 255, 136, 0.2);
-            position: relative;
             z-index: 1000;
         }
 
@@ -88,18 +76,10 @@
             box-shadow: 0px 0px 10px #00ff88;
         }
 
-        .game-container {
-            display: none;
-            padding: 15px;
-        }
+        .game-container { display: none; padding: 15px; }
+        .game-container.active { display: block; }
 
-        .game-container.active {
-            display: block;
-        }
-
-        /* ========================================================
-           GAME 1: 2D SKY RUNNER STYLES
-           ======================================================== */
+        /* GAME 1: 2D RUNNER */
         #runner-game-box {
             width: 320px; 
             height: 180px;
@@ -110,7 +90,6 @@
             overflow: hidden;
             box-shadow: 0px 4px 15px rgba(0, 183, 255, 0.4);
             background: linear-gradient(180deg, #3a9bdc 0%, #87ceeb 70%, #e0f6ff 100%);
-            transition: background 1.5s ease;
             cursor: pointer;
         }
 
@@ -122,13 +101,12 @@
         .sun {
             position: absolute; top: 15px; right: 25px; width: 30px; height: 30px;
             background: #ffde59; border-radius: 50%; box-shadow: 0px 0px 15px #ffde59;
-            transition: opacity 1s ease;
         }
 
         .moon-graphic {
             position: absolute; top: 15px; right: 25px; width: 35px; height: 35px;
             background: #e6e6e6; border-radius: 50%; box-shadow: 0px 0px 15px #ffffff;
-            opacity: 0; transition: opacity 1s ease;
+            opacity: 0;
         }
 
         #runner-game-box.moon-mode .sun { opacity: 0; }
@@ -136,7 +114,7 @@
 
         .ground-line {
             position: absolute; bottom: 0; width: 100%; height: 6px;
-            background-color: #55aa33; transition: background-color 1s ease;
+            background-color: #55aa33;
         }
 
         #runner-game-box.moon-mode .ground-line { background-color: #8888aa; }
@@ -145,7 +123,6 @@
             width: 30px; height: 30px; background-color: #00ff88; 
             border: 2px solid #009944; border-radius: 4px;
             position: absolute; bottom: 6px; left: 20px;
-            transition: opacity 0.1s ease;
         }
 
         .invulnerable { background-color: #ffaa00 !important; opacity: 0.5; }
@@ -157,9 +134,7 @@
             display: flex; align-items: center; justify-content: center;
         }
 
-        #runner-game-box.moon-mode #cactus {
-            background-color: #a020f0; border-color: #d87093;
-        }
+        #runner-game-box.moon-mode #cactus { background-color: #a020f0; border-color: #d87093; }
 
         .jump-animation { animation: jump 0.6s ease-in-out; }
 
@@ -182,12 +157,9 @@
             background-color: #00ff88; color: #000; border: none;
             padding: 10px 24px; font-size: 1rem; font-weight: bold;
             border-radius: 6px; cursor: pointer; margin-top: 10px;
-            box-shadow: 0px 4px 10px rgba(0, 255, 136, 0.4);
         }
 
-        /* ========================================================
-           GAME 2: 3D FPS SHOOTER STYLES
-           ======================================================== */
+        /* GAME 2: 3D FPS SHOOTER */
         #fps-wrapper {
             position: relative;
             width: 100%;
@@ -216,32 +188,31 @@
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0, 0, 0, 0.85); display: flex; flex-direction: column;
             justify-content: center; align-items: center; color: white;
-            cursor: pointer; z-index: 10;
+            z-index: 10;
         }
 
         #fps-start-btn {
-            margin-top: 15px; padding: 10px 25px; font-size: 1.1rem; font-weight: bold;
-            background-color: #00ff88; border: none; border-radius: 5px; cursor: pointer;
+            margin-top: 15px; padding: 12px 28px; font-size: 1.1rem; font-weight: bold;
+            background-color: #00ff88; color: #000; border: none; border-radius: 5px; cursor: pointer;
+            box-shadow: 0 0 10px #00ff88;
         }
     </style>
 </head>
 <body>
 
-    <!-- MOBILE / DESKTOP SITE NOTICE BANNER -->
+    <!-- NOTICE BANNER -->
     <div id="mobile-notice">
-        <span>💡 <b>Tip for Mobile Users:</b> If you are using <b>Desktop Site Mode</b>, turn it off or zoom in to the game box for optimal controls and layout!</span>
+        <span>💡 <b>Tip for Mobile Users:</b> If you are using <b>Desktop Site Mode</b>, turn it off or zoom in to the game box for optimal controls!</span>
         <button class="close-notice-btn" onclick="document.getElementById('mobile-notice').style.display='none'">×</button>
     </div>
 
-    <!-- ARCADE MENU BAR -->
+    <!-- ARCADE NAV BAR -->
     <div id="arcade-nav">
         <button id="btn-game1" class="nav-btn active" onclick="switchGame(1)">🏃 2D Sky Runner</button>
         <button id="btn-game2" class="nav-btn" onclick="switchGame(2)">🎯 3D FPS Shooter</button>
     </div>
 
-    <!-- ========================================================
-         GAME 1 CONTAINER (2D SKY RUNNER)
-         ======================================================== -->
+    <!-- GAME 1: 2D RUNNER -->
     <div id="game1-container" class="game-container active">
         <h2>2D SKY RUNNER</h2>
         
@@ -266,9 +237,7 @@
         <p style="color: #aaa; font-size: 0.85rem;">Tap or click inside the game box to jump!</p>
     </div>
 
-    <!-- ========================================================
-         GAME 2 CONTAINER (3D FPS SHOOTER)
-         ======================================================== -->
+    <!-- GAME 2: 3D FPS SHOOTER -->
     <div id="game2-container" class="game-container">
         <h2>3D FPS SHOOTER</h2>
         <div id="fps-wrapper">
@@ -278,11 +247,11 @@
             
             <div id="crosshair"></div>
 
-            <div id="fps-overlay" onclick="startFPSGame()">
+            <div id="fps-overlay">
                 <h2 id="fps-title" style="color:#00ff88; margin-bottom:5px;">3D FPS SHOOTER</h2>
-                <p id="fps-subtext">Click inside to lock mouse & start</p>
+                <p id="fps-subtext">Click the button below to start & lock controls</p>
                 <p style="font-size: 0.85rem; color: #aaa;">[WASD] Move | [Mouse] Aim | [Left Click] Shoot</p>
-                <button id="fps-start-btn">PLAY 3D GAME</button>
+                <button id="fps-start-btn" onclick="startFPSGame()">PLAY 3D GAME</button>
             </div>
         </div>
     </div>
@@ -290,9 +259,6 @@
     <script>
         let currentActiveGame = 1;
 
-        // ========================================================
-        // TAB SWITCHING LOGIC
-        // ========================================================
         function switchGame(gameNum) {
             currentActiveGame = gameNum;
             document.querySelectorAll('.game-container').forEach(el => el.classList.remove('active'));
@@ -309,9 +275,9 @@
             }
         }
 
-        // ========================================================
-        // GAME 1: 2D RUNNER ENGINE
-        // ========================================================
+        /* ----------------------------------------------------
+           GAME 1: 2D RUNNER ENGINE
+           ---------------------------------------------------- */
         const dino = document.getElementById("dino");
         const cactus = document.getElementById("cactus");
         const runnerScoreDisplay = document.getElementById("runner-score");
@@ -335,8 +301,6 @@
         }
 
         function startRunnerGame() {
-            if (isRunnerRunning) return;
-
             if (runnerAnimationId) cancelAnimationFrame(runnerAnimationId);
 
             rScore = 0; distance = 0; lives = 3; currentSpeed = baseSpeed;
@@ -416,9 +380,9 @@
             runnerAnimationId = requestAnimationFrame(moveRunnerEnemy);
         }
 
-        // ========================================================
-        // GAME 2: 3D FPS ENGINE
-        // ========================================================
+        /* ----------------------------------------------------
+           GAME 2: 3D FPS ENGINE
+           ---------------------------------------------------- */
         let scene, camera, renderer, targets = [], fpsScore = 0, fpsHealth = 100, isFPSRunning = false;
         let moveForward = false, moveBackward = false, moveLeft = false, moveRight = false;
         let direction = new THREE.Vector3();
@@ -440,7 +404,7 @@
             renderer.setSize(container.clientWidth, container.clientHeight);
             container.appendChild(renderer.domElement);
 
-            const ambientLight = new THREE.AmbientLight(0xffffff, 0.4);
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
             scene.add(ambientLight);
 
             const gridHelper = new THREE.GridHelper(100, 50, 0x00ff88, 0x222244);
@@ -461,7 +425,7 @@
             });
 
             document.addEventListener('mousemove', (e) => {
-                if (document.pointerLockElement !== document.body) return;
+                if (!isFPSRunning) return;
                 yaw -= e.movementX * 0.002;
                 pitch -= e.movementY * 0.002;
                 pitch = Math.max(-Math.PI / 2.2, Math.min(Math.PI / 2.2, pitch));
@@ -472,7 +436,7 @@
             });
 
             container.addEventListener('mousedown', () => {
-                if (!isFPSRunning || document.pointerLockElement !== document.body) return;
+                if (!isFPSRunning) return;
                 const raycaster = new THREE.Raycaster();
                 raycaster.setFromCamera(new THREE.Vector2(0, 0), camera);
                 const intersects = raycaster.intersectObjects(targets);
@@ -497,7 +461,7 @@
             const target = new THREE.Mesh(geo, mat);
 
             const angle = Math.random() * Math.PI * 2;
-            const dist = 25 + Math.random() * 15;
+            const dist = 20 + Math.random() * 15;
             target.position.set(Math.cos(angle) * dist, 1 + Math.random() * 3, Math.sin(angle) * dist);
 
             scene.add(target);
@@ -506,4 +470,39 @@
 
         let lastTime = performance.now();
         function animate3D() {
-            requestAnimationF
+            requestAnimationFrame(animate3D);
+            const time = performance.now();
+            const delta = (time - lastTime) / 1000;
+            lastTime = time;
+
+            if (isFPSRunning && currentActiveGame === 2) {
+                direction.z = Number(moveForward) - Number(moveBackward);
+                direction.x = Number(moveRight) - Number(moveLeft);
+                direction.normalize();
+
+                if (moveForward || moveBackward) camera.translateZ(-direction.z * 12.0 * delta);
+                if (moveLeft || moveRight) camera.translateX(direction.x * 12.0 * delta);
+                camera.position.y = 1.6;
+
+                targets.forEach((target) => {
+                    target.rotation.x += delta;
+                    target.position.x += (camera.position.x - target.position.x) * 0.3 * delta;
+                    target.position.z += (camera.position.z - target.position.z) * 0.3 * delta;
+
+                    if (target.position.distanceTo(camera.position) < 2.0) {
+                        fpsHealth -= 15;
+                        document.getElementById('fps-health').innerText = Math.max(0, fpsHealth);
+                        scene.remove(target);
+                        targets = targets.filter(t => t !== target);
+                        if (fpsHealth <= 0) gameOver3D();
+                    }
+                });
+            }
+            if (renderer && scene && camera && currentActiveGame === 2) {
+                renderer.render(scene, camera);
+            }
+        }
+
+        function startFPSGame() {
+            // Request Pointer Lock directly on button click
+            const container = document.getElementBy
