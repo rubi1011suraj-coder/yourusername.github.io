@@ -3,19 +3,70 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Free Games - Space Runner</title>
+    <title>Arcade Hub</title>
+    
+    <!-- Three.js Library for 3D Game -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
     <style>
+        /* ========================================================
+           GLOBAL & NAVIGATION STYLES
+           ======================================================== */
         body {
-            background-color: #111;
+            background-color: #0d0d15;
             color: #ffffff;
-            font-family: sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             text-align: center;
             margin: 0;
-            padding: 20px;
+            padding: 0;
+            overflow-x: hidden;
+            user-select: none;
         }
 
-        /* GAME BOX CONTAINER */
-        #game-box {
+        /* TOP ARCADE MENU BAR */
+        #arcade-nav {
+            background: #181828;
+            padding: 12px;
+            border-bottom: 3px solid #00ff88;
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            box-shadow: 0px 4px 15px rgba(0, 255, 136, 0.2);
+            position: relative;
+            z-index: 1000;
+        }
+
+        .nav-btn {
+            background: #252538;
+            color: #fff;
+            border: 2px solid #00ff88;
+            padding: 8px 18px;
+            font-size: 0.95rem;
+            font-weight: bold;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .nav-btn:hover, .nav-btn.active {
+            background: #00ff88;
+            color: #000;
+            box-shadow: 0px 0px 10px #00ff88;
+        }
+
+        .game-container {
+            display: none;
+            padding: 15px;
+        }
+
+        .game-container.active {
+            display: block;
+        }
+
+        /* ========================================================
+           GAME 1: 2D SKY RUNNER STYLES
+           ======================================================== */
+        #runner-game-box {
             width: 320px; 
             height: 180px;
             position: relative;
@@ -24,117 +75,58 @@
             border-radius: 8px;
             overflow: hidden;
             box-shadow: 0px 4px 15px rgba(0, 183, 255, 0.4);
-            
-            /* Bright Blue Sky Gradient */
             background: linear-gradient(180deg, #3a9bdc 0%, #87ceeb 70%, #e0f6ff 100%);
             transition: background 1.5s ease;
         }
 
-        /* MOON ENVIRONMENT MODE (Triggers at 10,000m) */
-        #game-box.moon-mode {
+        #runner-game-box.moon-mode {
             background: linear-gradient(180deg, #020208 0%, #0d0d2b 70%, #202040 100%) !important;
             box-shadow: 0px 0px 20px rgba(180, 0, 255, 0.5);
         }
 
-        /* ENVIRONMENT GRAPHICS */
         .sun {
-            position: absolute;
-            top: 15px;
-            right: 25px;
-            width: 30px;
-            height: 30px;
-            background: #ffde59;
-            border-radius: 50%;
-            box-shadow: 0px 0px 15px #ffde59;
+            position: absolute; top: 15px; right: 25px; width: 30px; height: 30px;
+            background: #ffde59; border-radius: 50%; box-shadow: 0px 0px 15px #ffde59;
             transition: opacity 1s ease;
         }
 
         .moon-graphic {
-            position: absolute;
-            top: 15px;
-            right: 25px;
-            width: 35px;
-            height: 35px;
-            background: #e6e6e6;
-            border-radius: 50%;
-            box-shadow: 0px 0px 15px #ffffff;
-            opacity: 0;
-            transition: opacity 1s ease;
+            position: absolute; top: 15px; right: 25px; width: 35px; height: 35px;
+            background: #e6e6e6; border-radius: 50%; box-shadow: 0px 0px 15px #ffffff;
+            opacity: 0; transition: opacity 1s ease;
         }
 
-        #game-box.moon-mode .sun { opacity: 0; }
-        #game-box.moon-mode .moon-graphic { opacity: 1; }
+        #runner-game-box.moon-mode .sun { opacity: 0; }
+        #runner-game-box.moon-mode .moon-graphic { opacity: 1; }
 
-        .cloud {
-            position: absolute;
-            background: rgba(255, 255, 255, 0.85);
-            border-radius: 20px;
-            transition: opacity 1s ease;
-        }
-        .cloud-1 { width: 50px; height: 16px; top: 25px; left: 30px; }
-        .cloud-2 { width: 40px; height: 14px; top: 50px; left: 170px; }
-
-        #game-box.moon-mode .cloud { opacity: 0; }
-
-        /* GROUND LINE */
         .ground-line {
-            position: absolute;
-            bottom: 0;
-            width: 100%;
-            height: 6px;
-            background-color: #55aa33;
-            transition: background-color 1s ease;
+            position: absolute; bottom: 0; width: 100%; height: 6px;
+            background-color: #55aa33; transition: background-color 1s ease;
         }
 
-        #game-box.moon-mode .ground-line {
-            background-color: #8888aa; /* Moon Dust */
-        }
+        #runner-game-box.moon-mode .ground-line { background-color: #8888aa; }
 
-        /* THE DINO (Green Player) */
         #dino {
-            width: 30px;
-            height: 30px;
-            background-color: #00ff88; 
-            border: 2px solid #009944;
-            border-radius: 4px;
-            position: absolute;
-            bottom: 6px;
-            left: 20px;
-            box-shadow: 0px 0px 6px rgba(0,0,0,0.3);
+            width: 30px; height: 30px; background-color: #00ff88; 
+            border: 2px solid #009944; border-radius: 4px;
+            position: absolute; bottom: 6px; left: 20px;
             transition: width 0.3s ease, height 0.3s ease, opacity 0.1s ease;
         }
 
-        .invulnerable {
-            background-color: #ffaa00 !important;
-            opacity: 0.5;
-        }
+        .invulnerable { background-color: #ffaa00 !important; opacity: 0.5; }
 
-        /* ENEMY (Cactus / Alien) */
         #cactus {
-            width: 20px;
-            height: 30px;
-            background-color: #ff3333; 
-            border: 2px solid #990000;
-            border-radius: 3px;
-            position: absolute;
-            bottom: 6px;
-            left: 320px;
-            font-size: 16px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: width 0.3s ease, height 0.3s ease;
+            width: 20px; height: 30px; background-color: #ff3333; 
+            border: 2px solid #990000; border-radius: 3px;
+            position: absolute; bottom: 6px; left: 320px; font-size: 16px;
+            display: flex; align-items: center; justify-content: center;
         }
 
-        #game-box.moon-mode #cactus {
-            background-color: #a020f0; /* Alien Purple */
-            border-color: #d87093;
-            box-shadow: 0px 0px 8px #a020f0;
+        #runner-game-box.moon-mode #cactus {
+            background-color: #a020f0; border-color: #d87093;
         }
 
-        .jump-animation {
-            animation: jump 0.6s ease-in-out;
-        }
+        .jump-animation { animation: jump 0.6s ease-in-out; }
 
         @keyframes jump {
             0% { bottom: 6px; }
@@ -142,97 +134,150 @@
             100% { bottom: 6px; }
         }
 
-        /* HUD & STATS */
         .stats-panel {
-            display: flex;
-            justify-content: space-around;
-            width: 320px;
-            margin: 10px auto;
-            font-size: 1rem;
-            font-weight: bold;
+            display: flex; justify-content: space-around; width: 320px;
+            margin: 10px auto; font-size: 1rem; font-weight: bold;
         }
 
-        #health-bar { color: #ff3333; letter-spacing: 2px; }
+        #health-bar { color: #ff3333; }
         #distance-board { color: #00ccff; }
         #score-board { color: #ffff55; font-size: 1.1rem; font-weight: bold; }
-        #location-tag { color: #00ff88; font-weight: bold; margin-top: 5px; height: 20px; }
 
-        /* START BUTTON */
-        #start-btn {
-            background-color: #00ff88;
-            color: #000000;
-            border: none;
-            padding: 10px 24px;
-            font-size: 1rem;
-            font-weight: bold;
-            border-radius: 6px;
-            cursor: pointer;
-            margin-top: 10px;
-            box-shadow: 0px 4px 10px rgba(0, 255, 136, 0.4);
+        #runner-start-btn {
+            background-color: #00ff88; color: #000; border: none;
+            padding: 10px 24px; font-size: 1rem; font-weight: bold;
+            border-radius: 6px; cursor: pointer; margin-top: 10px;
         }
 
-        #start-btn:active { transform: scale(0.95); }
+        /* ========================================================
+           GAME 2: 3D FPS SHOOTER STYLES
+           ======================================================== */
+        #fps-wrapper {
+            position: relative;
+            width: 100%;
+            height: 80vh;
+            background-color: #000;
+            border: 2px solid #00ff88;
+            border-radius: 8px;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+
+        #fps-hud {
+            position: absolute; top: 15px; left: 15px; color: #00ff88;
+            font-size: 18px; font-weight: bold; pointer-events: none;
+            text-shadow: 0 0 8px #00ff88; z-index: 5;
+        }
+
+        #crosshair {
+            position: absolute; top: 50%; left: 50%; width: 8px; height: 8px;
+            background-color: #00ff88; border: 2px solid #fff; border-radius: 50%;
+            transform: translate(-50%, -50%); pointer-events: none; z-index: 5;
+        }
+
+        #fps-overlay {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.85); display: flex; flex-direction: column;
+            justify-content: center; align-items: center; color: white;
+            cursor: pointer; z-index: 10;
+        }
+
+        #fps-start-btn {
+            margin-top: 15px; padding: 10px 25px; font-size: 1.1rem; font-weight: bold;
+            background-color: #00ff88; border: none; border-radius: 5px; cursor: pointer;
+        }
     </style>
 </head>
 <body>
 
-    <h1>Free Games</h1>
-    
-    <div id="game-box" onclick="jump()">
-        <div class="sun"></div>
-        <div class="moon-graphic"></div>
-        <div class="cloud cloud-1"></div>
-        <div class="cloud cloud-2"></div>
-        <div id="dino"></div>
-        <div id="cactus"></div>
-        <div class="ground-line"></div>
+    <!-- ARCADE MENU BAR -->
+    <div id="arcade-nav">
+        <button id="btn-game1" class="nav-btn active" onclick="switchGame(1)">🏃 2D Sky Runner</button>
+        <button id="btn-game2" class="nav-btn" onclick="switchGame(2)">🎯 3D FPS Shooter</button>
     </div>
 
-    <div id="location-tag">EARTH ATMOSPHERE</div>
+    <!-- ========================================================
+         GAME 1 CONTAINER (2D SKY RUNNER)
+         ======================================================== -->
+    <div id="game1-container" class="game-container active">
+        <h2>2D SKY RUNNER</h2>
+        
+        <div id="runner-game-box" onclick="runnerJump()">
+            <div class="sun"></div>
+            <div class="moon-graphic"></div>
+            <div id="dino"></div>
+            <div id="cactus"></div>
+            <div class="ground-line"></div>
+        </div>
 
-    <!-- Stats HUD -->
-    <div class="stats-panel">
-        <div>HEALTH: <span id="health-bar">❤️❤️❤️</span></div>
-        <div>DIST: <span id="distance-board">0</span>m</div>
+        <div id="location-tag" style="color:#00ff88; font-weight:bold;">EARTH ATMOSPHERE</div>
+
+        <div class="stats-panel">
+            <div>HEALTH: <span id="health-bar">❤️❤️❤️</span></div>
+            <div>DIST: <span id="distance-board">0</span>m</div>
+        </div>
+
+        <div id="score-board">SCORE: <span id="runner-score">0</span></div>
+
+        <button id="runner-start-btn" onclick="startRunnerGame()">Start Game</button>
+        <p style="color: #aaa; font-size: 0.85rem;">Tap inside the box to jump!</p>
     </div>
 
-    <div id="score-board">SCORE: <span id="score">0</span></div>
+    <!-- ========================================================
+         GAME 2 CONTAINER (3D FPS SHOOTER)
+         ======================================================== -->
+    <div id="game2-container" class="game-container">
+        <div id="fps-wrapper">
+            <div id="fps-hud">
+                SCORE: <span id="fps-score">0</span> | HEALTH: <span id="fps-health">100</span>%
+            </div>
+            
+            <div id="crosshair"></div>
 
-    <!-- Speed Bar Indicator -->
-    <div style="margin-top: 10px; font-weight: bold; font-size: 0.85rem;">
-        SPEED LEVEL
-        <div style="width: 200px; height: 12px; background-color: #222; border: 2px solid #555; margin: 5px auto; border-radius: 4px; overflow: hidden;">
-            <div id="speed-bar" style="width: 20%; height: 100%; background-color: #00ff88; transition: width 0.3s ease;"></div>
+            <div id="fps-overlay" onclick="startFPSGame()">
+                <h2 id="fps-title" style="color:#00ff88; margin-bottom:5px;">3D FPS SHOOTER</h2>
+                <p id="fps-subtext">Click inside to lock mouse & start</p>
+                <p style="font-size: 0.85rem; color: #aaa;">[WASD] Move | [Mouse] Aim | [Left Click] Shoot</p>
+                <button id="fps-start-btn">PLAY 3D GAME</button>
+            </div>
         </div>
     </div>
 
-    <button id="start-btn" onclick="startGame()">Start Game</button>
-
-    <p style="color: #aaa; font-size: 0.85rem;">Tap inside the box to jump!</p>
-
     <script>
+        // ========================================================
+        // TAB SWITCHING LOGIC
+        // ========================================================
+        function switchGame(gameNum) {
+            document.querySelectorAll('.game-container').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
+
+            if (gameNum === 1) {
+                document.getElementById('game1-container').classList.add('active');
+                document.getElementById('btn-game1').classList.add('active');
+                if (document.pointerLockElement) document.exitPointerLock();
+            } else {
+                document.getElementById('game2-container').classList.add('active');
+                document.getElementById('btn-game2').classList.add('active');
+                init3DOnce();
+            }
+        }
+
+        // ========================================================
+        // GAME 1: 2D RUNNER ENGINE
+        // ========================================================
         const dino = document.getElementById("dino");
         const cactus = document.getElementById("cactus");
-        const scoreDisplay = document.getElementById("score");
+        const runnerScoreDisplay = document.getElementById("runner-score");
         const distanceDisplay = document.getElementById("distance-board");
         const healthDisplay = document.getElementById("health-bar");
-        const speedBar = document.getElementById("speed-bar");
-        const startBtn = document.getElementById("start-btn");
-        const gameBox = document.getElementById("game-box");
+        const runnerStartBtn = document.getElementById("runner-start-btn");
+        const runnerGameBox = document.getElementById("runner-game-box");
         const locationTag = document.getElementById("location-tag");
 
-        let score = 0;
-        let distance = 0;
-        let lives = 3;
-        let baseSpeed = 4; 
-        let currentSpeed = baseSpeed;
-        let maxSpeed = 8; 
-        let currentScale = 1;
-        let isAlive = false; 
-        let gameRunning = false;
-        let isInvulnerable = false;
-        let cactusLeft = 320;
-        let isMoonMode = false;
+        let rScore = 0, distance = 0, lives = 3;
+        let baseSpeed = 4, currentSpeed = baseSpeed, maxSpeed = 8;
+        let currentScale = 1, isRunnerAlive = false, isRunnerRunning = false;
+        let isInvulnerable = false, cactusLeft = 320, isMoonMode = false;
 
         function updateHealthUI() {
             if (lives === 3) healthDisplay.innerText = "❤️❤️❤️";
@@ -241,130 +286,210 @@
             else healthDisplay.innerText = "🖤🖤🖤";
         }
 
-        function startGame() {
-            if (gameRunning) return;
+        function startRunnerGame() {
+            if (isRunnerRunning) return;
 
-            // Reset Logic
-            score = 0;
-            distance = 0;
-            lives = 3;
-            currentSpeed = baseSpeed;
-            currentScale = 1;
-            cactusLeft = 320;
-            isAlive = true;
-            gameRunning = true;
-            isInvulnerable = false;
-            isMoonMode = false;
+            rScore = 0; distance = 0; lives = 3; currentSpeed = baseSpeed;
+            cactusLeft = 320; isRunnerAlive = true; isRunnerRunning = true;
+            isInvulnerable = false; isMoonMode = false;
 
-            // Reset UI
-            scoreDisplay.innerText = score;
+            runnerScoreDisplay.innerText = rScore;
             distanceDisplay.innerText = distance;
             locationTag.innerText = "EARTH ATMOSPHERE";
             locationTag.style.color = "#00ff88";
             updateHealthUI();
             
-            speedBar.style.width = "20%";
-            gameBox.classList.remove("moon-mode");
+            runnerGameBox.classList.remove("moon-mode");
             dino.classList.remove("invulnerable");
-
-            dino.style.width = "30px";
-            dino.style.height = "30px";
-            cactus.style.width = "20px";
-            cactus.style.height = "30px";
-            cactus.style.left = "320px";
             cactus.innerText = "";
+            runnerStartBtn.style.display = "none";
 
-            startBtn.style.display = "none";
-            moveEnemy();
+            moveRunnerEnemy();
         }
 
-        function jump() {
-            if (!dino.classList.contains("jump-animation") && isAlive) {
-                // High Jump inside frame bounds
-                let jumpPeak = isMoonMode ? 140 : 120; 
-
+        function runnerJump() {
+            if (!dino.classList.contains("jump-animation") && isRunnerAlive) {
+                let jumpPeak = isMoonMode ? 140 : 120;
                 document.documentElement.style.setProperty('--jump-height', jumpPeak + 'px');
-
                 dino.classList.add("jump-animation");
-                
-                setTimeout(function() {
-                    dino.classList.remove("jump-animation");
-                }, 600);
+                setTimeout(() => dino.classList.remove("jump-animation"), 600);
             }
         }
 
-        function moveEnemy() {
-            if (!isAlive) return;
+        function moveRunnerEnemy() {
+            if (!isRunnerAlive) return;
 
-            cactusLeft -= currentSpeed; 
-            
-            // Fast distance counter (Reaches 10,000m quickly)
+            cactusLeft -= currentSpeed;
             distance += Math.floor(currentSpeed * 2);
             distanceDisplay.innerText = distance;
 
-            // TRIGGER MOON MODE AT 10,000 METERS!
             if (distance >= 10000 && !isMoonMode) {
                 isMoonMode = true;
-                gameBox.classList.add("moon-mode");
+                runnerGameBox.classList.add("moon-mode");
                 locationTag.innerText = "🌕 MOON EXPLORATION MODE";
                 locationTag.style.color = "#a020f0";
-                cactus.innerText = "👽"; 
+                cactus.innerText = "👽";
             }
 
-            // Obstacle reset when it passes screen
             if (cactusLeft < -25) {
-                cactusLeft = 320; 
-                score++;
-                scoreDisplay.innerText = score;
-
-                if (score > 0 && score % 5 === 0) {
-                    if (currentSpeed < maxSpeed) {
-                        currentSpeed += 0.5;
-                    }
-                    speedBar.style.width = Math.min(100, (currentSpeed / maxSpeed) * 100) + "%";
-                }
+                cactusLeft = 320;
+                rScore++;
+                runnerScoreDisplay.innerText = rScore;
+                if (rScore % 5 === 0 && currentSpeed < maxSpeed) currentSpeed += 0.5;
             }
             
             cactus.style.left = cactusLeft + "px";
-            
-            // Collision Detection & Alien Stomp
             let dinoBottom = parseInt(window.getComputedStyle(dino).getPropertyValue("bottom"));
 
             if (cactusLeft > 15 && cactusLeft < 45) {
-                // ALIEN STOMP CHECK (If dino lands on top of Alien)
                 if (isMoonMode && dinoBottom > 15) {
-                    score += 5; // Bonus Points!
-                    scoreDisplay.innerText = score;
-                    cactusLeft = 320; // Squash Alien and spawn new one
-                } 
-                // NORMAL SIDE COLLISION
-                else if (!isInvulnerable && dinoBottom < 25) {
+                    rScore += 5;
+                    runnerScoreDisplay.innerText = rScore;
+                    cactusLeft = 320;
+                } else if (!isInvulnerable && dinoBottom < 25) {
                     lives--;
                     updateHealthUI();
-
                     if (lives <= 0) {
-                        isAlive = false;
-                        gameRunning = false;
-                        startBtn.innerText = "Play Again";
-                        startBtn.style.display = "inline-block";
-                        alert("Game Over! Final Score: " + score + " | Distance: " + distance + "m");
+                        isRunnerAlive = false; isRunnerRunning = false;
+                        runnerStartBtn.innerText = "Play Again";
+                        runnerStartBtn.style.display = "inline-block";
+                        alert("Game Over! Final Score: " + rScore);
                         return;
                     } else {
                         isInvulnerable = true;
                         dino.classList.add("invulnerable");
-
-                        setTimeout(function() {
-                            isInvulnerable = false;
-                            dino.classList.remove("invulnerable");
-                        }, 1000);
+                        setTimeout(() => { isInvulnerable = false; dino.classList.remove("invulnerable"); }, 1000);
                     }
                 }
             }
 
-            requestAnimationFrame(moveEnemy);
+            requestAnimationFrame(moveRunnerEnemy);
         }
-    </script>
 
-</body>
-    </html>
-    
+        // ========================================================
+        // GAME 2: 3D FPS ENGINE
+        // ========================================================
+        let scene, camera, renderer, targets = [], fpsScore = 0, fpsHealth = 100, isFPSRunning = false;
+        let moveForward = false, moveBackward = false, moveLeft = false, moveRight = false;
+        let velocity = new THREE.Vector3(), direction = new THREE.Vector3();
+        let pitch = 0, yaw = 0, is3DInitialized = false;
+
+        function init3DOnce() {
+            if (is3DInitialized) return;
+            is3DInitialized = true;
+
+            const container = document.getElementById('fps-wrapper');
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x0a0a1a);
+            scene.fog = new THREE.FogExp2(0x0a0a1a, 0.015);
+
+            camera = new THREE.PerspectiveCamera(75, container.clientWidth / container.clientHeight, 0.1, 1000);
+            camera.position.set(0, 1.6, 0);
+
+            renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer.setSize(container.clientWidth, container.clientHeight);
+            container.appendChild(renderer.domElement);
+
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.4);
+            scene.add(ambientLight);
+
+            const gridHelper = new THREE.GridHelper(100, 50, 0x00ff88, 0x222244);
+            scene.add(gridHelper);
+
+            document.addEventListener('keydown', (e) => {
+                if (e.code === 'KeyW') moveForward = true;
+                if (e.code === 'KeyS') moveBackward = true;
+                if (e.code === 'KeyA') moveLeft = true;
+                if (e.code === 'KeyD') moveRight = true;
+            });
+
+            document.addEventListener('keyup', (e) => {
+                if (e.code === 'KeyW') moveForward = false;
+                if (e.code === 'KeyS') moveBackward = false;
+                if (e.code === 'KeyA') moveLeft = false;
+                if (e.code === 'KeyD') moveRight = false;
+            });
+
+            document.addEventListener('mousemove', (e) => {
+                if (document.pointerLockElement !== document.body) return;
+                yaw -= e.movementX * 0.002;
+                pitch -= e.movementY * 0.002;
+                pitch = Math.max(-Math.PI / 2.2, Math.min(Math.PI / 2.2, pitch));
+
+                const euler = new THREE.Euler(0, 0, 0, 'YXZ');
+                euler.x = pitch; euler.y = yaw;
+                camera.quaternion.setFromEuler(euler);
+            });
+
+            container.addEventListener('mousedown', () => {
+                if (!isFPSRunning || document.pointerLockElement !== document.body) return;
+                const raycaster = new THREE.Raycaster();
+                raycaster.setFromCamera(new THREE.Vector2(0, 0), camera);
+                const intersects = raycaster.intersectObjects(targets);
+
+                if (intersects.length > 0) {
+                    const hit = intersects[0].object;
+                    scene.remove(hit);
+                    targets = targets.filter(t => t !== hit);
+                    fpsScore += 10;
+                    document.getElementById('fps-score').innerText = fpsScore;
+                }
+            });
+
+            setInterval(spawnFPSTarget, 1500);
+            animate3D();
+        }
+
+        function spawnFPSTarget() {
+            if (!isFPSRunning) return;
+            const geo = new THREE.IcosahedronGeometry(1.2, 1);
+            const mat = new THREE.MeshPhongMaterial({ color: 0xff0055, wireframe: true });
+            const target = new THREE.Mesh(geo, mat);
+
+            const angle = Math.random() * Math.PI * 2;
+            const dist = 25 + Math.random() * 15;
+            target.position.set(Math.cos(angle) * dist, 1 + Math.random() * 3, Math.sin(angle) * dist);
+
+            scene.add(target);
+            targets.push(target);
+        }
+
+        let lastTime = performance.now();
+        function animate3D() {
+            requestAnimationFrame(animate3D);
+            const time = performance.now();
+            const delta = (time - lastTime) / 1000;
+            lastTime = time;
+
+            if (isFPSRunning) {
+                direction.z = Number(moveForward) - Number(moveBackward);
+                direction.x = Number(moveRight) - Number(moveLeft);
+                direction.normalize();
+
+                if (moveForward || moveBackward) camera.translateZ(-direction.z * 12.0 * delta);
+                if (moveLeft || moveRight) camera.translateX(direction.x * 12.0 * delta);
+                camera.position.y = 1.6;
+
+                targets.forEach((target) => {
+                    target.rotation.x += delta;
+                    target.position.x += (camera.position.x - target.position.x) * 0.3 * delta;
+                    target.position.z += (camera.position.z - target.position.z) * 0.3 * delta;
+
+                    if (target.position.distanceTo(camera.position) < 2.0) {
+                        fpsHealth -= 15;
+                        document.getElementById('fps-health').innerText = Math.max(0, fpsHealth);
+                        scene.remove(target);
+                        targets = targets.filter(t => t !== target);
+                        if (fpsHealth <= 0) gameOver3D();
+                    }
+                });
+            }
+            if (renderer && scene && camera) renderer.render(scene, camera);
+        }
+
+        function startFPSGame() {
+            document.body.requestPointerLock();
+            if (isFPSRunning) return;
+
+            fpsScore = 0; fpsHealth = 100;
+            document.getElementById('fps-score').innerTe
