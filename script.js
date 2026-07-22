@@ -18,72 +18,81 @@ let brake = false;
 const gasBtn = document.getElementById("gas");
 const brakeBtn = document.getElementById("brake");
 
-function pressGas(e) {
-    e.preventDefault();
-    gas = true;
+function pressGas(e){e.preventDefault();gas=true;}
+function releaseGas(e){e.preventDefault();gas=false;}
+function pressBrake(e){e.preventDefault();brake=true;}
+function releaseBrake(e){e.preventDefault();brake=false;}
+
+gasBtn.addEventListener("touchstart",pressGas);
+gasBtn.addEventListener("touchend",releaseGas);
+gasBtn.addEventListener("mousedown",pressGas);
+gasBtn.addEventListener("mouseup",releaseGas);
+
+brakeBtn.addEventListener("touchstart",pressBrake);
+brakeBtn.addEventListener("touchend",releaseBrake);
+brakeBtn.addEventListener("mousedown",pressBrake);
+brakeBtn.addEventListener("mouseup",releaseBrake);
+
+function getGroundY(x){
+    return canvas.height-120+
+    Math.sin((x+distance)*0.02)*40;
 }
-function releaseGas(e) {
-    e.preventDefault();
-    gas = false;
-}
-function pressBrake(e) {
-    e.preventDefault();
-    brake = true;
-}
-function releaseBrake(e) {
-    e.preventDefault();
-    brake = false;
-}
 
-gasBtn.addEventListener("touchstart", pressGas);
-gasBtn.addEventListener("touchend", releaseGas);
-gasBtn.addEventListener("mousedown", pressGas);
-gasBtn.addEventListener("mouseup", releaseGas);
+function gameLoop(){
 
-brakeBtn.addEventListener("touchstart", pressBrake);
-brakeBtn.addEventListener("touchend", releaseBrake);
-brakeBtn.addEventListener("mousedown", pressBrake);
-brakeBtn.addEventListener("mouseup", releaseBrake);
+    if(gas) speed+=0.12;
+    if(brake) speed-=0.12;
 
-function gameLoop() {
+    speed*=0.98;
 
-    if (gas) speed += 0.1;
-    if (brake) speed -= 0.1;
+    if(speed<0) speed=0;
+    if(speed>8) speed=8;
 
-    speed *= 0.98;
+    distance+=speed;
 
-    if (speed < 0) speed = 0;
-    if (speed > 8) speed = 8;
+    document.getElementById("distance").textContent=
+    "Distance: "+Math.floor(distance)+" m";
 
-    distance += speed;
-
-    document.getElementById("distance").textContent =
-        "Distance: " + Math.floor(distance) + " m";
-
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.clearRect(0,0,canvas.width,canvas.height);
 
     // Sky
-    ctx.fillStyle = "#87CEEB";
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle="#87CEEB";
+    ctx.fillRect(0,0,canvas.width,canvas.height);
+
+    // Sun
+    ctx.fillStyle="yellow";
+    ctx.beginPath();
+    ctx.arc(80,80,35,0,Math.PI*2);
+    ctx.fill();
 
     // Hills
-ctx.fillStyle = "#4CAF50";
-ctx.beginPath();
+    ctx.fillStyle="#4CAF50";
+    ctx.beginPath();
+    ctx.moveTo(0,canvas.height);
 
-ctx.moveTo(0, canvas.height);
+    for(let x=0;x<=canvas.width;x++){
+        ctx.lineTo(x,getGroundY(x));
+    }
 
+    ctx.lineTo(canvas.width,canvas.height);
+    ctx.closePath();
+    ctx.fill();
 
+    let groundY=getGroundY(carX+45);
 
-ctx.lineTo(canvas.width, canvas.height);
-ctx.closePath();
-ctx.fill();
     // Car body
-    ctx.fillStyle = "red";
-    ctx.fillRect(carX, canvas.height - 160, 90, 35);
-let y = canvas.height - 120 + Math.sin((x + distance) * 0.02) * 40;
+    ctx.fillStyle="red";
+    ctx.fillRect(carX,groundY-50,90,30);
+
+    // Car roof
+    ctx.fillStyle="darkred";
+    ctx.fillRect(carX+20,groundY-70,45,20);
+
     // Wheels
-    ctx.arc(carX + 20, canvas.height - 125, 15, 0, Math.PI * 2);
-ctx.arc(carX + 70, canvas.height - 125, 15, 0, Math.PI * 2);
+    ctx.fillStyle="black";
+    ctx.beginPath();
+    ctx.arc(carX+20,groundY-10,15,0,Math.PI*2);
+    ctx.arc(carX+70,groundY-10,15,0,Math.PI*2);
     ctx.fill();
 
     requestAnimationFrame(gameLoop);
