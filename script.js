@@ -72,22 +72,18 @@ ctx.beginPath();
 
 ctx.moveTo(0, canvas.height);
 
-for (let x = 0; x <= canvas.width; x++) {
-    let y = canvas.height - 180 + Math.sin((x + distance) * 0.01) * 80;
-}
+
 
 ctx.lineTo(canvas.width, canvas.height);
 ctx.closePath();
 ctx.fill();
     // Car body
     ctx.fillStyle = "red";
-    ctx.fillRect(carX, canvas.height - 170, 90, 35);
-
+    ctx.fillRect(carX, canvas.height - 160, 90, 35);
+let y = canvas.height - 120 + Math.sin((x + distance) * 0.02) * 40;
     // Wheels
-    ctx.fillStyle = "black";
-    ctx.beginPath();
-    ctx.arc(carX + 20, canvas.height - 135, 15, 0, Math.PI * 2);
-    ctx.arc(carX + 70, canvas.height - 135, 15, 0, Math.PI * 2);
+    ctx.arc(carX + 20, canvas.height - 125, 15, 0, Math.PI * 2);
+ctx.arc(carX + 70, canvas.height - 125, 15, 0, Math.PI * 2);
     ctx.fill();
 
     requestAnimationFrame(gameLoop);
