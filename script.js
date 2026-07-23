@@ -61,7 +61,8 @@ function gameLoop(){
     "Distance: "+Math.floor(distance)+" m";
 
     ctx.clearRect(0,0,canvas.width,canvas.height);
-
+const bgImg = new Image();
+bgImg.src = "Background.jpg";
     // Background
 if (bgImg.complete) {
     ctx.drawImage(bgImg, 0, 0, canvas.width, canvas.height);
