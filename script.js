@@ -63,7 +63,12 @@ function gameLoop(){
     ctx.clearRect(0,0,canvas.width,canvas.height);
 
     // Background
-ctx.drawImage(bgImg, 0, 0, canvas.width, canvas.height);
+if (bgImg.complete) {
+    ctx.drawImage(bgImg, 0, 0, canvas.width, canvas.height);
+} else {
+    ctx.fillStyle = "#87CEEB";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+}
     // Sun
     ctx.fillStyle="yellow";
     ctx.beginPath();
