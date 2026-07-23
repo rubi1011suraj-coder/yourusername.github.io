@@ -91,9 +91,10 @@ if (bgImg.complete) {
 
     let groundY=getGroundY(carX+45);
 
-    // Car
-ctx.drawImage(carImg, carX, groundY - 70, 120, 70);
+    let groundY = getGroundY(carX + 45);
 
+// Draw car on the ground
+ctx.drawImage(carImg, carX, groundY - 80, 120, 80);
     // Wheels
     ctx.fillStyle="black";
     ctx.beginPath();
