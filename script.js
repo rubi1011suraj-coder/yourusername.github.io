@@ -92,7 +92,7 @@ if (bgImg.complete) {
     let groundY=getGroundY(carX+45);
 
     // Car
-ctx.drawImage(carImg, carX, groundY - 70, 120, 70);
+ctx.drawImage(carImg, 50, 50, 150, 100);
 
     // Car roof
     ctx.fillStyle="darkred";
