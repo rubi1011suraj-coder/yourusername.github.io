@@ -1,6 +1,13 @@
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
+const bgImg = new Image();
+bgImg.src = "Background.jpg";
 
+const carImg = new Image();
+carImg.src = "Car.jpg";
+
+const wheelImg = new Image();
+wheelImg.src = "Wheel.jpg";
 function resize() {
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
@@ -55,10 +62,8 @@ function gameLoop(){
 
     ctx.clearRect(0,0,canvas.width,canvas.height);
 
-    // Sky
-    ctx.fillStyle="#87CEEB";
-    ctx.fillRect(0,0,canvas.width,canvas.height);
-
+    // Background
+ctx.drawImage(bgImg, 0, 0, canvas.width, canvas.height);
     // Sun
     ctx.fillStyle="yellow";
     ctx.beginPath();
