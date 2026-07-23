@@ -111,12 +111,11 @@ function gameLoop(){
         ctx.drawImage(carImg, carX, groundY - 60, 120, 60);
     }
 
-    // Wheels (temporary)
-    ctx.fillStyle = "black";
-    ctx.beginPath();
-    ctx.arc(carX + 20, groundY - 10, 15, 0, Math.PI * 2);
-    ctx.arc(carX + 70, groundY - 10, 15, 0, Math.PI * 2);
-    ctx.fill();
+    // Wheels
+if (wheelImg.complete) {
+    ctx.drawImage(wheelImg, carX + 8, groundY - 25, 34, 34);
+    ctx.drawImage(wheelImg, carX + 78, groundY - 25, 34, 34);
+                  }
 
     requestAnimationFrame(gameLoop);
 }
